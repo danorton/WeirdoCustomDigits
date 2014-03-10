@@ -1,6 +1,9 @@
 /**
  * @mainpage
- * @Copyright
+ *
+ * This module provides the WeirdoCustomDigits PHP class.
+ *
+ * @copyright
  *   © 2014 Daniel Norton d/b/a WeirdoSoft - www.weirdosoft.com
  *
  * @section License

@@ -24,13 +24,20 @@ require_once(__DIR__ . '/WeirdoCustomDigits.php');
 
 class WeirdoCustomDigitsInt extends WeirdoCustomDigits {
 
+	/**
+	 * The maximum value of a number
+	 *
+	 * For this class, the value is the lesser of PHP_INT_MAX and pow(2,self::$phpIntegerMaxBits)-1
+	 */
+	public static $maximumValue ;
+
 	public function __construct($digits = NULL, $radix = NULL, $use_uc = true) {
 		parent::__construct($digits, $radix, $use_uc);
 	}
 
-	public function customFromDecimal($decimalNumber, $minCustomDigits=1 ) {
-		return $this->customFromInternal($decimalNumber, $minCustomDigits);
-	}
+  public function customFromDecimal($decimalNumber, $minCustomDigits=1 ) {
+    return $this->customFromInternal($decimalNumber, $minCustomDigits);
+  }
 
 	public function customFromHex($hexNumber, $minCustomDigits=1 ) {
 		return $this->customFromInternal(hexdec($hexNumber), $minCustomDigits);
@@ -139,22 +146,23 @@ class WeirdoCustomDigitsInt extends WeirdoCustomDigits {
 
 	/**
 	 * Initialize this class's static properties.
+	 * @private
 	 *
 	 * PHP only allows variable declarations with simple constants, so we have this
 	 * function for more complex initialization of statics. Although "public" in
 	 * construction, it is usable in this source file, only, immediately after this
 	 * class is declared. Any attempt to invoke this method a second time will throw
 	 * an ErrorException.
-	 *
-	 * @private
 	 */
 	public static function _initStatic() {
-		if ( !static::$maximumValue ) {
-		  static::$maximumValue = min(0x07ffffffffffffff,PHP_INT_MAX);
-		} else {
-			throw new ErrorException( sprintf( 'Invalid invocation of %s().', __METHOD__ ) );
-		}
+	  if ( !self::$maximumValue ) {
+			self::$maximumValue = (int) min ( PHP_INT_MAX, pow( 2, self::$phpIntegerMaxBits ) - 1 ) ;
+	  } else {
+	    throw new ErrorException( sprintf( 'Invalid invocation of %s().', __METHOD__ ) );
+	  }
 	}
 
 }
+// Once-only invocation to initialize static properties
 WeirdoCustomDigitsInt::_initStatic();
+

@@ -31,21 +31,50 @@ function getException($context,$fn) {
 	return $exception;
 }
 
+function get_rand() {
+  if (PHP_INT_MAX > mt_getrandmax()) {
+    return (mt_rand() << 31 | mt_rand());
+  }
+	return mt_rand();
+}
+
 function error_handler($errno, $errstr, $errfile, $errline, $errcontext) {
 	printf("FAIL: ERROR %u at %s:%u: %s\n", $errno, $errfile, $errline, $errstr);
 	exit(1);
 }
 set_error_handler('error_handler');
 
+// generate some random numbers
+//*///
+require_once(__DIR__ . '/../WeirdoCustomDigitsInt.php');
+printf("WeirdoCustomDigitsInt::\$maximumValue=%s\n",WeirdoCustomDigitsInt::$maximumValue);
+$randomInts = array(0);
+for ( $i = 0; $i<10000; $i++) {
+	$randomInts[] = get_rand() & WeirdoCustomDigitsInt::$maximumValue;
+}
+$randomInts[] = WeirdoCustomDigitsInt::$maximumValue;
+
+$randomDecimalStrings = array('0');
+for ( $i = 0; $i<10000; $i++) {
+	$randomDecimalStrings[] = get_rand() . get_rand() . get_rand();
+}
+$randomDecimalStrings[] = PHP_INT_MAX . PHP_INT_MAX . PHP_INT_MAX;
+//*///
+
 $failures = array();
+$customResults = array();
+
 foreach (array('Int', 'Gmp', 'Bc') as $mathType) {
+//foreach (array('Int', 'Bc') as $mathType) {
+//foreach (array('Bc', 'Int') as $mathType) {
 	echo "===== mathType=$mathType ======\n";
 	$className = "WeirdoCustomDigits$mathType";
 	echo "===== class=$className ======\n";
 	require_once(__DIR__ . "/../$className.php");
 
-	if (isset($className::$maximumValue)) {
+	if ($className::$maximumValue !== null) {
 		$maximumInteger = $className::$maximumValue;
+		printf("%s::\$maximumValue=0x%016X\n", $className, $maximumInteger);
 	} else {
 		$maximumInteger = PHP_INT_MAX;
 	}
@@ -113,34 +142,33 @@ foreach (array('Int', 'Gmp', 'Bc') as $mathType) {
 	}
 	assert($result === 'I, II, III, IV, V, VI, VII, VIII, IX, X');
 
-	// try forward and inverse mapping for 5,000 numbers using base 51
-	// pre-generate numbers for performance comparison
-	$randomNumbers = array();
-	if (is_int($wrdx51->internalFromDecimal(0))) {
-		for ( $i = 0; $i<5000; $i++) {
-			$randomNumbers[] = mt_rand() ;
-		}
-	  $randomNumbers[] = $className::$maximumValue;
+	// try forward and inverse mapping for random numbers to and from base 51
+	$randomNumberSets = array($randomInts);
+	if ($className::$maximumValue === null) {
+	  $randomNumberSets[] = $randomDecimalStrings;
 	}
-	else {
-		for ( $i = 0; $i<5000; $i++) {
-			$randomNumbers[] = mt_rand() . mt_rand() . mt_rand();
+	foreach ($randomNumberSets as $randomNumbers) {
+		$startTime = microtime(TRUE);
+		for ( $i = 0; $i<count($randomNumbers); $i++) {
+			$decimal = $randomNumbers[$i];
+			$number = $wrdx51->customFromDecimal($decimal);
+			if ((count($randomNumbers) - $i) < 10) printf("%s", $number);
+			$decimalInverse = $wrdx51->decimalFromCustom($number);
+			if ($decimal != $decimalInverse) {
+				throw new ErrorException(sprintf('Unit test failure: inverse map failed for random number (%s=>%s) (ix=%u)',
+					$decimal, $decimalInverse,$i ));
+			}
+			if (isset($customResults[$decimal])) {
+				assert($customResults[$decimal] === $number);
+			  if ((count($randomNumbers) - $i) < 10) printf("/OK ");
+			} else {
+			  if ((count($randomNumbers) - $i) < 10) printf("/?? ");
+				$customResults[$decimal] = $number;
+			}
 		}
-	  $randomNumbers[] = PHP_INT_MAX . PHP_INT_MAX . PHP_INT_MAX;
+		printf("\n%s ms\n", intval((microtime(TRUE) - $startTime)*1000000)/1000);
 	}
-	$randomNumbers[] = 0;
 
-	$startTime = microtime(TRUE);
-	for ( $i = 0; $i<count($randomNumbers); $i++) {
-		$decimal = $randomNumbers[$i];
-		$number = $wrdx51->customFromDecimal($decimal);
-		//if ($i > 4900) printf("%s ", $number);
-		$decimalInverse = $wrdx51->decimalFromCustom($number);
-		if ($decimal != $decimalInverse) {
-			throw new ErrorException(sprintf('Unit test failure: inverse map failed for random number (%s=>%s)', $decimal, $decimalInverse));
-		}
-	}
-	printf("%s ms\n", intval((microtime(TRUE) - $startTime)*1000000)/1000);
 
 	for ( $i=0; $i<10; $i++) {
 		$random = $wrdx51->customRandomDigits($i+1);
@@ -148,7 +176,7 @@ foreach (array('Int', 'Gmp', 'Bc') as $mathType) {
 		printf("%s:",$i+1);
 		printf("%s ", $random);
 		if ($className::$maximumValue) {
-			$random = $wrdx51->customRandomFromInternalRange($maximumInteger);
+			$random = $wrdx51->customRandomFromInternalRange($wrdx51->internalFromDecimal($maximumInteger));
 		}
 		else {
 			$random = $wrdx51->customRandomDigits(20);

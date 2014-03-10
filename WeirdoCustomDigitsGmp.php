@@ -1,29 +1,45 @@
 <?php
-// ex: ts=2 sw=2 noet ai:
-//
-// WeirdoCustomDigitsGmp - Implementation of WeirdoCustomDigits using gmp extension
-//
-// © 2014 Daniel Norton d/b/a WeirdoSoft - www.weirdosoft.com
-//
-// License: CC BY-SA 3.0
-//   This work is licensed under the Creative Commons
-//   Attribution-ShareAlike 3.0 Unported License. To view a copy of
-//   this license, visit http://creativecommons.org/licenses/by-sa/3.0/
-//   or send a letter to Creative Commons, 444 Castro Street, Suite 900,
-//   Mountain View, California, 94041, USA.
-//
-// REQUIREMENTS:
-//  - PHP 5.3 or later
-// 	- gmp extension
-// 	- if using UTF-8 digits, PCRE UTF-8 support is required
-//
-// LIMITATIONS:
-//  - No support for multi-byte characters, except UTF-8
-//
+/**
+ * @addtogroup WeirdoCustomDigits
+ * @{
+ *
+ * @file
+ * @{
+ * @copyright © 2014 Daniel Norton d/b/a WeirdoSoft - www.weirdosoft.com
+ *
+ * @section License
+ *    - <b>CC BY-SA 3.0</b> -
+ *   This work is licensed under the Creative Commons
+ *   Attribution-ShareAlike 3.0 Unported License. To view a copy of
+ *   this license, visit http://creativecommons.org/licenses/by-sa/3.0/
+ *   or send a letter to Creative Commons, 444 Castro Street, Suite 900,
+ *   Mountain View, California, 94041, USA.
+ * @}
+ *
+ */
 
 require_once(__DIR__ . '/WeirdoCustomDigits.php');
 
+/**
+ * Implementation of WeirdoCustomDigits using the gmp extension for arithmetic
+ *
+ * @section Requirements
+ *  - gmp extension ( See php.net/gmp )
+ *
+ * @section Limitations
+ *  - None more than WeirdoCustomDigits.
+ *
+ * The "internally represented" format for values of this subclass is the internal value that
+ * gmp uses, e.g. the value returned by gmp_init().
+ */
 class WeirdoCustomDigitsGmp extends WeirdoCustomDigits {
+
+	/**
+	 * The maximum value of a number
+	 *
+	 * For this class, the value is null, meaning that there is no limit.
+	 */
+	public static $maximumValue = null;
 
 	public function __construct($digits = NULL, $radix = NULL, $use_uc = true) {
 		// we require gmp
