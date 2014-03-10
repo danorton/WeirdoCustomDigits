@@ -1,11 +1,10 @@
 WeirdoCustomDigits
 ==================
-
-This module provides the WeirdoCustomDigits PHP classes.
-
 © 2014 Daniel Norton d/b/a WeirdoSoft - www.weirdosoft.com
 
-API documentation is in the dox folder.
+This module provides the WeirdoCustomDigits PHP classes, which convert custom numbers with arbitrary radixes and digit characters.
+
+More details and API documentation are in the dox folder.
 
 **LICENSE:** CC BY-SA 3.0 - 
 This work is licensed under the Creative Commons
