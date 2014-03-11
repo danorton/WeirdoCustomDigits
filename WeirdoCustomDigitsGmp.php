@@ -56,6 +56,13 @@ class WeirdoCustomDigitsGmp extends WeirdoCustomDigits {
 		$this->_radix = gmp_init($this->_radix);
 	}
 
+  /**
+   * For parameters and semantics, see WeirdoCustomDigits::binFromDecimal().
+   */
+	public static function binFromDecimal( $decimalNumber ) {
+    return gmp_strval( gmp_init( $decimalNumber, 10 ), 2 );
+  }
+
 	public function customFromDecimal($decimalNumber, $minCustomDigits=1) {
 		// gmp implicity converts decimal
 		return $this->customFromInternal($decimalNumber, $minCustomDigits);
@@ -109,9 +116,14 @@ class WeirdoCustomDigitsGmp extends WeirdoCustomDigits {
 		return $random;
 	}
 
+  /** For parameters and semantics, see WeirdoCustomDigits::decimalFromBin(). */
+	public static function decimalFromBin( $binNumber ) {
+    return gmp_strval( gmp_init( $binNumber, 2 ), 10 );
+  }
+
   /** For parameters and semantics, see WeirdoCustomDigits::decimalFromHex(). */
 	public static function decimalFromHex( $hexNumber ) {
-    return gmp_strval( gmp_init( $decimalNumber, 16 ), 10 );
+    return gmp_strval( gmp_init( $hexNumber, 16 ), 10 );
   }
 
 	public function decimalFromCustom($customNumber) {
