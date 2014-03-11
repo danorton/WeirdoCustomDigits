@@ -56,7 +56,7 @@ $randomInts[] = WeirdoCustomDigitsInt::$maximumValue;
 
 $randomDecimalStrings = array('0');
 for ( $i = 0; $i<10000; $i++) {
-	$randomDecimalStrings[] = get_rand() . get_rand() . get_rand();
+	$randomDecimalStrings[] = get_rand() . get_rand() . get_rand() . get_rand() . get_rand();
 }
 $randomDecimalStrings[] = PHP_INT_MAX . PHP_INT_MAX . PHP_INT_MAX;
 //*///
@@ -152,7 +152,7 @@ foreach (array('Int', 'Gmp', 'Bc') as $mathType) {
 		for ( $i = 0; $i<count($randomNumbers); $i++) {
 			$decimal = (string)$randomNumbers[$i];
 			$number = $wrdx51->customFromDecimal($decimal);
-			if ((count($randomNumbers) - $i) < 10) printf("%s", $number);
+			if ((count($randomNumbers) - $i) < 3) printf("%s", $number);
 			$decimalInverse = $wrdx51->decimalFromCustom($number);
 			if ($decimal != $decimalInverse) {
 				throw new ErrorException(sprintf('Unit test failure: inverse map failed for random number (%s=>%s) (ix=%u)',
@@ -160,9 +160,9 @@ foreach (array('Int', 'Gmp', 'Bc') as $mathType) {
 			}
 			if (isset($customResults[$decimal])) {
 				assert($customResults[$decimal] === $number);
-			  if ((count($randomNumbers) - $i) < 10) printf("/OK ");
+			  if ((count($randomNumbers) - $i) < 3) printf("/OK ");
 			} else {
-			  if ((count($randomNumbers) - $i) < 10) printf("/?? ");
+			  if ((count($randomNumbers) - $i) < 3) printf("/?? ");
 				$customResults[$decimal] = $number;
 			}
 
