@@ -109,6 +109,11 @@ class WeirdoCustomDigitsGmp extends WeirdoCustomDigits {
 		return $random;
 	}
 
+  /** For parameters and semantics, see WeirdoCustomDigits::decimalFromHex(). */
+	public static function decimalFromHex( $hexNumber ) {
+    return gmp_strval( gmp_init( $decimalNumber, 16 ), 10 );
+  }
+
 	public function decimalFromCustom($customNumber) {
 		return gmp_strval($this->internalFromCustom($customNumber),10);
 	}
@@ -121,7 +126,7 @@ class WeirdoCustomDigitsGmp extends WeirdoCustomDigits {
    * For parameters and semantics, see WeirdoCustomDigits::hexFromDecimal().
    */
 	public static function hexFromDecimal( $decimalNumber ) {
-    return gmp_strval( gmp_init( $decimalNumber, 10 ) );
+    return gmp_strval( gmp_init( $decimalNumber, 10 ), 16 );
 	}
 
 	public function hexFromCustom($customNumber) {
