@@ -4,7 +4,7 @@ WeirdoCustomDigits
 
 This module provides the WeirdoCustomDigits PHP classes, which convert custom numbers with arbitrary radixes and digit characters.
 
-More details and API documentation are in the dox folder.
+The latest release documentation is at http://danorton.github.io/WeirdoCustomDigits/dox/
 
 **LICENSE:** CC BY-SA 3.0 - 
 This work is licensed under the Creative Commons
