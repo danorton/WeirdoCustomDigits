@@ -309,7 +309,7 @@ class WeirdoCustomDigitsBc extends WeirdoCustomDigits {
    */
 	public static function _initStatic() {
 		if ( !self::$_hexdecChunkSize) {
-		  self::$_hexdecChunkSize = (self::$phpIntegerMaxBits - 1) >> 2;
+		  self::$_hexdecChunkSize = min( ( PHP_INT_SIZE << 3 ) - 1, self::$phpIntegerMaxBits ) >> 2;
 			self::$_dechexDivisor = sprintf( '%.0f', hexdec( '1' . str_repeat( '0', self::$_hexdecChunkSize ) ) );
       self::$_hexChunkPaddingFormat = '%0' . self::$_hexdecChunkSize . 's';
 	    self::$_bindecChunkSize = self::$_hexdecChunkSize << 2;
