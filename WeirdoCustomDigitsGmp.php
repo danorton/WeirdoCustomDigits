@@ -24,7 +24,7 @@ require_once( __DIR__ . '/WeirdoCustomDigits.php' );
  * Implementation of WeirdoCustomDigits using the gmp extension for arithmetic
  *
  * @section Requirements
- *  - gmp extension ( See php.net/gmp )
+ *  - gmp extension ( See http://php.net/gmp )
  *
  * @section Limitations
  *  - None more than WeirdoCustomDigits.
@@ -35,13 +35,13 @@ require_once( __DIR__ . '/WeirdoCustomDigits.php' );
 class WeirdoCustomDigitsGmp extends WeirdoCustomDigits {
 
 	/**
-   * For parameters and semantics, see WeirdoCustomDigits::$maximumValue.
+	 * For parameters and semantics, see WeirdoCustomDigits::$maximumValue.
 	 *
 	 * For this class, the value is null, meaning that there is no limit.
 	 */
 	public static $maximumValue = null;
 
-  /** For parameters and semantics, see WeirdoCustomDigits::__construct().  */
+	/** For parameters and semantics, see WeirdoCustomDigits::__construct(). */
 	public function __construct( $digits = null, $radix = null, $use_uc = true ) {
 		// we require gmp
 		if ( !function_exists( 'gmp_init' ) ) {
@@ -52,37 +52,37 @@ class WeirdoCustomDigitsGmp extends WeirdoCustomDigits {
 		parent::__construct( $digits, $radix, $use_uc );
 	}
 
-  /** For parameters and semantics, see WeirdoCustomDigits::init().  */
+	/** For parameters and semantics, see WeirdoCustomDigits::init(). */
 	public function init( $digits = null, $radix = null, $use_uc = true ) {
 		parent::init( $digits, $radix, $use_uc );
 		// map PHP ints to gmp objects
 		$this->_digitValues = array_map(
-      function( $v ) {
-        return gmp_init( $v );
-      },
-      $this->_digitValues
-      );
+			function( $v ) {
+				return gmp_init( $v );
+			},
+			$this->_digitValues
+			);
 		$this->_radix = gmp_init( $this->_radix );
 	}
 
-  /** For parameters and semantics, see WeirdoCustomDigits::binFromDecimal().  */
+	/** For parameters and semantics, see WeirdoCustomDigits::binFromDecimal(). */
 	public static function binFromDecimal( $decimalNumber ) {
-    return gmp_strval( gmp_init( $decimalNumber, 10 ), 2 );
-  }
+		return gmp_strval( gmp_init( $decimalNumber, 10 ), 2 );
+	}
 
-  /** For parameters and semantics, see WeirdoCustomDigits::customFromDecimal().  */
+	/** For parameters and semantics, see WeirdoCustomDigits::customFromDecimal(). */
 	public function customFromDecimal( $decimalNumber, $minCustomDigits=1 ) {
 		// gmp implicity converts decimal
 		return $this->customFromInternal( $decimalNumber, $minCustomDigits );
 	}
 
-  /** For parameters and semantics, see WeirdoCustomDigits::customFromHex().  */
+	/** For parameters and semantics, see WeirdoCustomDigits::customFromHex(). */
 	public function customFromHex( $hexNumber, $minCustomDigits=1 ) {
 		// gmp will convert from hex when prefixed with '0x'
 		return $this->customFromInternal( "0x$hexNumber", $minCustomDigits );
 	}
 
-  /** For parameters and semantics, see WeirdoCustomDigits::customFromInternal().  */
+	/** For parameters and semantics, see WeirdoCustomDigits::customFromInternal(). */
 	public function customFromInternal( $internal, $minCustomDigits=1 ) {
 		$digits = array();
 		while ( gmp_cmp( $internal, 0 ) ) {
@@ -92,14 +92,14 @@ class WeirdoCustomDigitsGmp extends WeirdoCustomDigits {
 		$customNumber = implode( array_reverse( $digits ) );
 		if ( count( $digits ) < $minCustomDigits ) {
 			$customNumber =
-        str_repeat($this->_digitsArray[0], $minCustomDigits - count( $digits ) ) .
-        $customNumber
-        ;
+				str_repeat($this->_digitsArray[0], $minCustomDigits - count( $digits ) ) .
+				$customNumber
+				;
 		}
 		return $customNumber;
 	}
 
-  /** For parameters and semantics, see WeirdoCustomDigits::customRandomDigits().  */
+	/** For parameters and semantics, see WeirdoCustomDigits::customRandomDigits(). */
 	public function customRandomDigits( $nDigits ) {
 		$range = $this->_getRangeNeededForCustomDigits( (int)$nDigits );
 		if ( $range ) {
@@ -107,7 +107,7 @@ class WeirdoCustomDigitsGmp extends WeirdoCustomDigits {
 		}
 	}
 
-  /** For parameters and semantics, see WeirdoCustomDigits::customRandomFromInternalRange().  */
+	/** For parameters and semantics, see WeirdoCustomDigits::customRandomFromInternalRange(). */
 	public function customRandomFromInternalRange( $rangeInternal ) {
 		$numBits = $this->_getBitsNeededForRangeInternal( $rangeInternal );
 		$limit = 100;
@@ -116,7 +116,7 @@ class WeirdoCustomDigitsGmp extends WeirdoCustomDigits {
 				if ( $limit-- < 0 ) {
 					throw new ErrorException(
 						sprintf( 'Error detected by %s(): randomization failure ( %u bits; rnd=0x%s; range=0x%s )', __METHOD__,
-						  $numBits,
+							$numBits,
 							gmp_strval( $random, 16 ),
 							gmp_strval( $rangeInternal, 16 )
 					) );
@@ -131,81 +131,81 @@ class WeirdoCustomDigitsGmp extends WeirdoCustomDigits {
 		return $random;
 	}
 
-  /** For parameters and semantics, see WeirdoCustomDigits::decimalFromBin(). */
+	/** For parameters and semantics, see WeirdoCustomDigits::decimalFromBin(). */
 	public static function decimalFromBin( $binNumber ) {
-    return gmp_strval( gmp_init( $binNumber, 2 ), 10 );
-  }
+		return gmp_strval( gmp_init( $binNumber, 2 ), 10 );
+	}
 
-  /** For parameters and semantics, see WeirdoCustomDigits::decimalFromHex(). */
+	/** For parameters and semantics, see WeirdoCustomDigits::decimalFromHex(). */
 	public static function decimalFromHex( $hexNumber ) {
-    return gmp_strval( gmp_init( $hexNumber, 16 ), 10 );
-  }
+		return gmp_strval( gmp_init( $hexNumber, 16 ), 10 );
+	}
 
-  /** For parameters and semantics, see WeirdoCustomDigits::decimalFromCustom(). */
+	/** For parameters and semantics, see WeirdoCustomDigits::decimalFromCustom(). */
 	public function decimalFromCustom( $customNumber ) {
 		return gmp_strval( $this->internalFromCustom( $customNumber ), 10 );
 	}
 
-  /** For parameters and semantics, see WeirdoCustomDigits::decimalFromInternal(). */
+	/** For parameters and semantics, see WeirdoCustomDigits::decimalFromInternal(). */
 	public function decimalFromInternal( $internal ) {
 		return gmp_strval( $internal, 10 );
 	}
 
-  /** For parameters and semantics, see WeirdoCustomDigits::hexFromDecimal(). */
+	/** For parameters and semantics, see WeirdoCustomDigits::hexFromDecimal(). */
 	public static function hexFromDecimal( $decimalNumber ) {
-    return gmp_strval( gmp_init( $decimalNumber, 10 ), 16 );
+		return gmp_strval( gmp_init( $decimalNumber, 10 ), 16 );
 	}
 
-  /** For parameters and semantics, see WeirdoCustomDigits::hexFromCustom(). */
+	/** For parameters and semantics, see WeirdoCustomDigits::hexFromCustom(). */
 	public function hexFromCustom( $customNumber ) {
 		return gmp_strval( $this->internalFromCustom( $customNumber ), 16 );
 	}
 
-  /** For parameters and semantics, see WeirdoCustomDigits::hexFromInternal(). */
+	/** For parameters and semantics, see WeirdoCustomDigits::hexFromInternal(). */
 	public function hexFromInternal( $internal ) {
 		return gmp_strval( $internal, 16 );
 	}
 
-  /** For parameters and semantics, see WeirdoCustomDigits::internalFromCustom(). */
+	/** For parameters and semantics, see WeirdoCustomDigits::internalFromCustom(). */
 	public function internalFromCustom( $customNumber, $minCustomDigits=1 ) {
 		$sum = gmp_init( 0 );
 		$digits = array_reverse( $this->str_split( $customNumber ) );
 		while ( count( $digits ) ) {
 			$key = "#" . array_pop( $digits );
 			if ( !isset( $this->_digitValues[$key] ) ) {
-			  throw new ErrorException( 'Error detected by ' . __METHOD__ . '(): unrecognized digit ( ' . substr( $key, 1 ) . ' ).' );
+				throw new ErrorException( 'Error detected by ' . __METHOD__ . '(): unrecognized digit ( ' . substr( $key, 1 ) . ' ).' );
 			}
 			$sum = gmp_add( gmp_mul( $sum, $this->_radix ), $this->_digitValues[$key] );
 		}
 		return $sum;
 	}
 
-  /** For parameters and semantics, see WeirdoCustomDigits::internalFromDecimal(). */
+	/** For parameters and semantics, see WeirdoCustomDigits::internalFromDecimal(). */
 	public function internalFromDecimal( $decimalNumber ) {
 		return gmp_init( $decimalNumber, 10 );
 	}
 
-  /** For parameters and semantics, see WeirdoCustomDigits::internalFromHex(). */
+	/** For parameters and semantics, see WeirdoCustomDigits::internalFromHex(). */
 	public function internalFromHex( $hexNumber ) {
 		return gmp_init( $hexNumber, 16 );
 	}
 
-  /** For parameters and semantics, see WeirdoCustomDigits::_getRangeNeededForCustomDigits(). */
-  protected function _getRangeNeededForCustomDigits( $nDigits ) {
-    if ( !array_key_exists( $nDigits, $this->_rangeNeededForDigits ) ) {
-      $this->_rangeNeededForDigits[$nDigits] = gmp_pow( $this->_radix, $nDigits ) ;
-      self::_trim_array_lru( $this->_rangeNeededForDigits, 100, 10 );
-    }
-    return $this->_rangeNeededForDigits[$nDigits];
-  }
+	/** For parameters and semantics, see WeirdoCustomDigits::_getRangeNeededForCustomDigits(). */
+	protected function _getRangeNeededForCustomDigits( $nDigits ) {
+		if ( !array_key_exists( $nDigits, $this->_rangeNeededForDigits ) ) {
+			$this->_rangeNeededForDigits[$nDigits] = gmp_pow( $this->_radix, $nDigits ) ;
+			self::_trim_array_lru( $this->_rangeNeededForDigits, 100, 10 );
+		}
+		return $this->_rangeNeededForDigits[$nDigits];
+	}
 
-  /** For parameters and semantics, see WeirdoCustomDigits::_getBitsNeededForRangeInternal(). */
+	/** For parameters and semantics, see WeirdoCustomDigits::_getBitsNeededForRangeInternal(). */
 	protected function _getBitsNeededForRangeInternal( $rangeInternal ) {
 		$key = "#" . gmp_strval( $rangeInternal, 62 );
 		if ( !array_key_exists( $key, $this->_bitsNeededForRange ) ) {
-      $this->_bitsNeededForRange[$key] = strlen( gmp_strval( gmp_sub( $rangeInternal, 1 ), 2 ) );
-      self::_trim_array_lru( $this->_bitsNeededForRange, 100, 10 );
-    }
+			$this->_bitsNeededForRange[$key] = strlen( gmp_strval( gmp_sub( $rangeInternal, 1 ), 2 ) );
+			self::_trim_array_lru( $this->_bitsNeededForRange, 100, 10 );
+		}
 		return $this->_bitsNeededForRange[$key];
 	}
 

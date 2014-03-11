@@ -46,6 +46,9 @@
  */
 abstract class WeirdoCustomDigits {
 
+	/** Class version */
+	const VERSION = '1.0.0';
+
 	/** Digits for radixes up to base 70 (including bc and gmp up to base 36) */
 	const DIGITS_70 =     '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_.*~!()-';
 
@@ -61,14 +64,14 @@ abstract class WeirdoCustomDigits {
 	/** Arabic decimal digits (UTF-8) */
 	const DIGITS_10_ARABIC_EAST = '٠١٢٣٤٥٦٧٨٩';
 
-  /** Precision of IEEE 754 floating point number */
-  const IEEE_754_SIGNIFICAND_BITS = 53;
+	/** Precision of IEEE 754 floating point number */
+	const IEEE_754_SIGNIFICAND_BITS = 53;
 
 	/** Set to @c true only if openssl random is not crypto safe */
 	public $allowNonCryptoRandom;
 
-  /** Maximum of contiguous range of integers that PHP supports for arithmetic */
-  public static $phpIntegerMaxBits = WeirdoCustomDigits::IEEE_754_SIGNIFICAND_BITS;
+	/** Maximum of contiguous range of integers that PHP supports for arithmetic */
+	public static $phpIntegerMaxBits = WeirdoCustomDigits::IEEE_754_SIGNIFICAND_BITS;
 
 	/**
 	 * The maximum value of a number
@@ -87,7 +90,7 @@ abstract class WeirdoCustomDigits {
 	 *                                  is passed, each element represents a single digit. (Numbers
 	 *                                  with multi-CHARACTER digits can be rendered, but not parsed,
 	 *                                  although multi-BYTE Unicode characters are just fine). Default
-   *                                  is WeirdoCustomDigits::DIGITS_70.
+	 *                                  is WeirdoCustomDigits::DIGITS_70.
 	 * @param[in] int    $radix   number of digits (i.e. the radix). Default is the number of digits
 	 *                            provided in @b $digits.
 	 * @param[in] bool   $use_uc  @c true if to allow Unicode characters in the custom number's set of
@@ -100,9 +103,9 @@ abstract class WeirdoCustomDigits {
 	 * @endcode
 	 */
 	public function __construct( $digits = null, $radix = null, $use_uc = true ) {
-	  $this->allowNonCryptoRandom = false;
-	  // set the parameter-variant instance properties (which can be changed, later)
-	  $this->init( $digits, $radix, $use_uc );
+		$this->allowNonCryptoRandom = false;
+		// set the parameter-variant instance properties (which can be changed, later)
+		$this->init( $digits, $radix, $use_uc );
 	}
 
 	/**
@@ -115,74 +118,74 @@ abstract class WeirdoCustomDigits {
 	 */
 	public function init( $digits = null, $radix = null, $use_uc = true ) {
 
-	  // set default character set for the digits
-	  if ( $digits === null ) {
-	    $digits = self::DIGITS_70;
-	  }
+		// set default character set for the digits
+		if ( $digits === null ) {
+			$digits = self::DIGITS_70;
+		}
 
-	  // clear properties built with different parameters
-	  $this->_rangeNeededForDigits = array();
-	  $this->_bitsNeededForRange = array();
-	  $this->_randomBitsNeeded = array();
+		// clear properties built with different parameters
+		$this->_rangeNeededForDigits = array();
+		$this->_bitsNeededForRange = array();
+		$this->_randomBitsNeeded = array();
 
-	  // use unicode if requested
-	  $this->_is_using_uc = $use_uc;
-	  if ( $this->_is_using_uc ) {
-	    $this->_fn['str_split'] =
-	      function( $str ) {
-	        return WeirdoCustomDigits::uc_str_split( $str );
-	      };
-	  } else {
-	    // support single-byte characters, only
-	    $this->_fn['str_split'] =
-	      function( $str ) {
-	        return str_split( $str );
-	      };
-	  }
+		// use unicode if requested
+		$this->_is_using_uc = $use_uc;
+		if ( $this->_is_using_uc ) {
+			$this->_fn['str_split'] =
+				function( $str ) {
+					return WeirdoCustomDigits::uc_str_split( $str );
+				};
+		} else {
+			// support single-byte characters, only
+			$this->_fn['str_split'] =
+				function( $str ) {
+					return str_split( $str );
+				};
+		}
 
-	  // get the digits as an array ( if not given an array )
-	  if ( is_array( $digits ) ) {
-	    $digitsArray = $digits;
-	  } else {
-	    $digitsArray = $this->str_split( $digits );
-	  }
+		// get the digits as an array ( if not given an array )
+		if ( is_array( $digits ) ) {
+			$digitsArray = $digits;
+		} else {
+			$digitsArray = $this->str_split( $digits );
+		}
 
-	  // get the ordinal value of each digit (performance shortcut)
-	  // PHP coerces keys to integers, if possible, so we need to make sure the array key isn't
-	  // a decimal number, to preserve the keys when the array is flipped.
-	  $digitValues =
-	    array_flip(
-	      array_map(
-	        function ( $digit ) {
-	          return "#$digit";
-	        },
-	          $digitsArray
-	        )
-	    );
+		// get the ordinal value of each digit (performance shortcut)
+		// PHP coerces keys to integers, if possible, so we need to make sure the array key isn't
+		// a decimal number, to preserve the keys when the array is flipped.
+		$digitValues =
+			array_flip(
+				array_map(
+					function ( $digit ) {
+						return "#$digit";
+					},
+						$digitsArray
+					)
+			);
 
-	  // verify that each digit is unique
-	  if ( count( $digitsArray ) != count( $digitValues ) ) {
-	    throw new ErrorException(
-	      sprintf( 'Error detected by %s(): radix digits are not all unique.', __METHOD__ )
-	    );
-	  }
+		// verify that each digit is unique
+		if ( count( $digitsArray ) != count( $digitValues ) ) {
+			throw new ErrorException(
+				sprintf( 'Error detected by %s(): radix digits are not all unique.', __METHOD__ )
+			);
+		}
 
-	  // get the radix, if not already set
-	  if ( $radix === null ) {
-	    $radix = count( $digitValues );
-	  }
+		// get the radix, if not already set
+		if ( $radix === null ) {
+			$radix = count( $digitValues );
+		}
 
-	  // verify that radix is in range for the given digits
-	  if ( $radix < 1 || $radix > count( $digitValues ) ) {
-	    throw new ErrorException(
-	      sprintf( 'Error detected by %s(): radix is out of range of available digits.', __METHOD__ )
-	    );
-	  }
+		// verify that radix is in range for the given digits
+		if ( $radix < 1 || $radix > count( $digitValues ) ) {
+			throw new ErrorException(
+				sprintf( 'Error detected by %s(): radix is out of range of available digits.', __METHOD__ )
+			);
+		}
 
-	  // set properties
-	  $this->_digitsArray = array_slice( $digitsArray, 0, $radix );
-	  $this->_digitValues = array_slice( $digitValues, 0, $radix );
-	  $this->_radix = $radix;
+		// set properties
+		$this->_digitsArray = array_slice( $digitsArray, 0, $radix );
+		$this->_digitValues = array_slice( $digitValues, 0, $radix );
+		$this->_radix = $radix;
 
 	}
 
@@ -194,13 +197,13 @@ abstract class WeirdoCustomDigits {
 	 * @param[in] string $customNumberDigit digit to validate
 	 */
 	public function validateCustomDigit( $customNumberDigit ) {
-	  if ( !isset( $this->_digitValues["#$customNumberDigit"] ) ) {
-	    throw new ErrorException(
-	      sprintf( 'Error detected by %s(): digit is not in the set of custom digits ( %s ).',
-	        __METHOD__, $customNumberDigit
-	      )
-	    );
-	  }
+		if ( !isset( $this->_digitValues["#$customNumberDigit"] ) ) {
+			throw new ErrorException(
+				sprintf( 'Error detected by %s(): digit is not in the set of custom digits ( %s ).',
+					__METHOD__, $customNumberDigit
+				)
+			);
+		}
 	}
 
 	/**
@@ -213,23 +216,23 @@ abstract class WeirdoCustomDigits {
 	 * @param[in] string $customNumber custom number to validate
 	 */
 	public function validateCustomNumber( $customNumber ) {
-	  foreach ( $this->str_split( $customNumber ) as $digit ) {
-	    $this->validateCustomDigit( $digit );
-	  }
+		foreach ( $this->str_split( $customNumber ) as $digit ) {
+			$this->validateCustomDigit( $digit );
+		}
 	}
 
 	/**
 	 * Convert a decimal number/string to a binary-number string of zero (0) and one (1) characters.
-   * @abstract
+	 * @abstract
 	 *
 	 * @param[in] string  $decimalNumber string of decimal digits (0-9)
 	 * @returns           binary-number string of zero (0) and one (1) characters.
 	 */
 	public static function binFromDecimal( $decimalNumber ) {
-	  throw new ErrorException(
-	    sprintf( 'Error detected by %s(): unimplemented abstract function invoked.', __METHOD__ )
-    );
-  }
+		throw new ErrorException(
+			sprintf( 'Error detected by %s(): unimplemented abstract function invoked.', __METHOD__ )
+		);
+	}
 
 	/**
 	 * Convert a hexadecimal string to a binary-number string of zero (0) and one (1) characters.
@@ -242,29 +245,29 @@ abstract class WeirdoCustomDigits {
 	 */
 	public static function binFromHex( $hexNumber ) {
 
-	  // trim leading zeros
-	  if ( $hexNumber[0] === '0' ) {
-	    $hexNumber = ltrim( $hexNumber, '0' );
-	    if ( $hexNumber === '' ) {
-	      return '0'; // quick exit for the degenerate case
-	    }
-	  }
+		// trim leading zeros
+		if ( $hexNumber[0] === '0' ) {
+			$hexNumber = ltrim( $hexNumber, '0' );
+			if ( $hexNumber === '' ) {
+				return '0'; // quick exit for the degenerate case
+			}
+		}
 
-	  // split the number into chunks that we can pass to decbin(hexdec($chunk))
-	  $hexChunks = str_split( strrev($hexNumber), self::$_hexbinChunkSize ) ;
+		// split the number into chunks that we can pass to decbin(hexdec($chunk))
+		$hexChunks = str_split( strrev($hexNumber), self::$_hexbinChunkSize ) ;
 
-	  // convert the highest-order chunk to binary and put into the first element of an array
-	  $binaryChunks = array( decbin( hexdec( strrev( array_pop( $hexChunks ) ) ) ) );
+		// convert the highest-order chunk to binary and put into the first element of an array
+		$binaryChunks = array( decbin( hexdec( strrev( array_pop( $hexChunks ) ) ) ) );
 
-	  // convert and pad the remaining hex chunks to equal-length binary chunks
-	  while ( count( $hexChunks ) ) {
-	    $binaryChunks[] = sprintf(self::$_binChunkPaddingFormat, // left zero pad
-	        decbin( hexdec( strrev( array_pop( $hexChunks ) ) ) )
-	      );
-	  }
+		// convert and pad the remaining hex chunks to equal-length binary chunks
+		while ( count( $hexChunks ) ) {
+			$binaryChunks[] = sprintf(self::$_binChunkPaddingFormat, // left zero pad
+					decbin( hexdec( strrev( array_pop( $hexChunks ) ) ) )
+				);
+		}
 
-	  // join all the binary chunks into a string
-	  return join( '', $binaryChunks ) ;
+		// join all the binary chunks into a string
+		return join( '', $binaryChunks ) ;
 	}
 
 
@@ -301,20 +304,20 @@ abstract class WeirdoCustomDigits {
 
 	/**
 	 * Convert a binary-number string to a decimal-number string
-   * @abstract
+	 * @abstract
 	 *
 	 * @param[in] string  $binNumber a binary-number string of zeros and ones
 	 * @returns           decimal-number string of decimal digits
 	 */
 	public static function decimalFromBin( $binNumber ) {
-	  throw new ErrorException(
-	    sprintf( 'Error detected by %s(): unimplemented abstract function invoked.', __METHOD__ )
-    );
-  }
+		throw new ErrorException(
+			sprintf( 'Error detected by %s(): unimplemented abstract function invoked.', __METHOD__ )
+		);
+	}
 
 	/**
 	 * Convert a binary-number string to a decimal-number string
-   * @abstract
+	 * @abstract
 	 *
 	 * @param[in] string  $customNumber a custom-number string
 	 * @returns           decimal-number string of decimal digits
@@ -322,10 +325,10 @@ abstract class WeirdoCustomDigits {
 	abstract public function decimalFromCustom( $customNumber );
 
 	public static function decimalFromHex( $hexNumber ) {
-	  throw new ErrorException(
-	    sprintf( 'Error detected by %s(): unimplemented abstract function invoked.', __METHOD__ )
-    );
-  }
+		throw new ErrorException(
+			sprintf( 'Error detected by %s(): unimplemented abstract function invoked.', __METHOD__ )
+		);
+	}
 
 	/**
 	 * Convert an internally represented number to a decimal-number string
@@ -341,33 +344,33 @@ abstract class WeirdoCustomDigits {
 	 * This method imposes no limit on the number of digits in the given number or in the resulting
 	 * hexadecimal number.
 	 *
-	 * @param[in] any     $internal a value returned from another method (e.g. from internalFrom...())
+	 * @param[in] string  $binNumber a binary-number string of zeros and ones
 	 * @returns           hexadecimal string of hexadecimal digits
 	 */
 	public static function hexFromBin( $binNumber ) {
 
-	  // trim leading zeros
-	  if ( $binNumber[0] === '0' ) {
-	    $binNumber = ltrim( $binNumber, '0' );
-	    if ( $binNumber === '' ) {
-	      return '0';   // quick exit for the degenerate case
-	    }
-	  }
+		// trim leading zeros
+		if ( $binNumber[0] === '0' ) {
+			$binNumber = ltrim( $binNumber, '0' );
+			if ( $binNumber === '' ) {
+				return '0';   // quick exit for the degenerate case
+			}
+		}
 
-	  // split the number into chunks that we can pass to dechex(bindec($chunk))
-	  $binChunks = str_split( strrev($binNumber), self::$_binhexChunkSize ) ;
+		// split the number into chunks that we can pass to dechex(bindec($chunk))
+		$binChunks = str_split( strrev($binNumber), self::$_binhexChunkSize ) ;
 
-	  // convert the highest-order chunk to hex and put into the first element of an array
-	  $hexChunks = array( dechex( bindec( strrev( array_pop( $binChunks ) ) ) ) );
+		// convert the highest-order chunk to hex and put into the first element of an array
+		$hexChunks = array( dechex( bindec( strrev( array_pop( $binChunks ) ) ) ) );
 
-	  // convert and pad the remaining binary chunks to equal-length hex chunks
-	  while ( count( $binChunks ) ) {
-	    $hexChunks[] = sprintf(self::$_hexChunkPaddingFormat, // left zero pad
-	        dechex( bindec( strrev( array_pop( $binChunks ) ) ) )
-	      );
-	  }
-	  // join all the hex chunks into a string
-	  return join( '', $hexChunks ) ;
+		// convert and pad the remaining binary chunks to equal-length hex chunks
+		while ( count( $binChunks ) ) {
+			$hexChunks[] = sprintf(self::$_hexChunkPaddingFormat, // left zero pad
+					dechex( bindec( strrev( array_pop( $binChunks ) ) ) )
+				);
+		}
+		// join all the hex chunks into a string
+		return join( '', $hexChunks ) ;
 	}
 
 	/**
@@ -380,16 +383,16 @@ abstract class WeirdoCustomDigits {
 
 	/**
 	 * Convert a decimal-number string to a hexadecimal string
-   * @abstract
+	 * @abstract
 	 *
 	 * @param[in] string  $decimalNumber decimal-number string
 	 * @returns           hexadecimal string
 	 */
 	public static function hexFromDecimal( $decimalNumber ) {
-	  throw new ErrorException(
-	    sprintf( 'Error detected by %s(): unimplemented abstract function invoked.', __METHOD__ )
-    );
-  }
+		throw new ErrorException(
+			sprintf( 'Error detected by %s(): unimplemented abstract function invoked.', __METHOD__ )
+		);
+	}
 
 	/**
 	 * Convert an internally represented number to a hexadecimal string
@@ -435,23 +438,23 @@ abstract class WeirdoCustomDigits {
 	 * @returns           hexadecimal digits.
 	 */
 	public function hexFromRandomBits( $nBits ) {
-	  // fetch random bytes
-	  $bits = openssl_random_pseudo_bytes( ( $nBits + 7 ) >> 3, $crypto );
-	  if ( !$crypto && !$this->allowNonCryptoRandom ) {
-	    throw new ErrorException(
-	      sprintf( 'Error detected by %s(): PHP lacks crypto-quality random generator.',
-	        __METHOD__, $customNumberDigit
-	      )
-	    );
-	  }
-	  // knock off the unwanted bits
-    $maskBits = ($nBits & 7);
-    if ( $maskBits ) {
-      $bits[0] = chr( ord( $bits[0] ) & ( ( 1 << $maskBits ) - 1 ) );
-    }
+		// fetch random bytes
+		$bits = openssl_random_pseudo_bytes( ( $nBits + 7 ) >> 3, $crypto );
+		if ( !$crypto && !$this->allowNonCryptoRandom ) {
+			throw new ErrorException(
+				sprintf( 'Error detected by %s(): PHP lacks crypto-quality random generator.',
+					__METHOD__, $customNumberDigit
+				)
+			);
+		}
+		// knock off the unwanted bits
+		$maskBits = ($nBits & 7);
+		if ( $maskBits ) {
+			$bits[0] = chr( ord( $bits[0] ) & ( ( 1 << $maskBits ) - 1 ) );
+		}
 
-	  // return the hex result
-	  return bin2hex( $bits );
+		// return the hex result
+		return bin2hex( $bits );
 	}
 
 	/**
@@ -479,7 +482,7 @@ abstract class WeirdoCustomDigits {
 	 * @returns           array of single-Unicode-character strings
 	 */
 	public static function uc_str_split( $str ) {
-	  return preg_split( '/(?<!^)(?!$)/u', $str );
+		return preg_split( '/(?<!^)(?!$)/u', $str );
 	}
 
 	/**
@@ -493,7 +496,7 @@ abstract class WeirdoCustomDigits {
 	 * @returns           array of single-character strings
 	 */
 	protected function str_split( $str ) {
-	  return $this->_fn['str_split']( $str );
+		return $this->_fn['str_split']( $str );
 	}
 
 	/**
@@ -528,16 +531,16 @@ abstract class WeirdoCustomDigits {
 	 * @param[in]     int   $chunkSize the number of elements in a "chunk"
 	 */
 	protected function _trim_array_lru( &$array, $maxCount, $chunkSize ) {
-	  if ( count( $array ) > $maxCount ) {
-	    $chunkLeft = $chunkSize;
-	    // ( We can't use array_splice, as it clobbers the remaining keys. )
-	    foreach ( array_keys( $array ) as $k ) {
-	      unset( $array[$k] );
-	      if ( --$chunkLeft <= 0 ) {
-	        break;
-	      }
-	    }
-	  }
+		if ( count( $array ) > $maxCount ) {
+			$chunkLeft = $chunkSize;
+			// ( We can't use array_splice, as it clobbers the remaining keys. )
+			foreach ( array_keys( $array ) as $k ) {
+				unset( $array[$k] );
+				if ( --$chunkLeft <= 0 ) {
+					break;
+				}
+			}
+		}
 	}
 
 	/**
@@ -551,16 +554,16 @@ abstract class WeirdoCustomDigits {
 	 * an ErrorException.
 	 */
 	public static function _initStatic() {
-	  if ( !self::$_hexbinChunkSize ) {
-	    self::$_hexbinChunkSize = strlen(decbin(PHP_INT_MAX))>>2;
-	    self::$_binhexChunkSize = self::$_hexbinChunkSize << 2;
-	    self::$_hexChunkPaddingFormat =       // printf format for hex left zero padding
-	      '%0' . self::$_hexbinChunkSize . 's';
-	    self::$_binChunkPaddingFormat =      // printf format for binary left zero padding
-	      '%0' . self::$_binhexChunkSize . 's';
-	  } else {
-	    throw new ErrorException( sprintf( 'Invalid invocation of %s().', __METHOD__ ) );
-	  }
+		if ( !self::$_hexbinChunkSize ) {
+			self::$_hexbinChunkSize = strlen(decbin(PHP_INT_MAX))>>2;
+			self::$_binhexChunkSize = self::$_hexbinChunkSize << 2;
+			self::$_hexChunkPaddingFormat =       // printf format for hex left zero padding
+				'%0' . self::$_hexbinChunkSize . 's';
+			self::$_binChunkPaddingFormat =      // printf format for binary left zero padding
+				'%0' . self::$_binhexChunkSize . 's';
+		} else {
+			throw new ErrorException( sprintf( 'Invalid invocation of %s().', __METHOD__ ) );
+		}
 	}
 
 	/**
