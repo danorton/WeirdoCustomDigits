@@ -55,9 +55,7 @@ class WeirdoCustomDigitsBc extends WeirdoCustomDigits {
 		parent::__construct( $digits, $radix, $use_uc );
 	}
 
-  /**
-   * For parameters and semantics, see WeirdoCustomDigits::binFromDecimal().
-   */
+  /** For parameters and semantics, see WeirdoCustomDigits::binFromDecimal(). */
 	public static function binFromDecimal( $decimalNumber ) {
 
     $binChunks = array();
@@ -73,25 +71,19 @@ class WeirdoCustomDigitsBc extends WeirdoCustomDigits {
 		return implode( '', array_reverse( $binChunks ) );
 	}
 
-  /**
-   * For parameters and semantics, see WeirdoCustomDigits::customFromDecimal().
-   */
+  /** For parameters and semantics, see WeirdoCustomDigits::customFromDecimal(). */
 	public function customFromDecimal( $decimalNumber, $minCustomDigits=1 ) {
 		// the internal format for bc accepts decimal strings directly
 		return $this->customFromInternal( $decimalNumber, $minCustomDigits );
 	}
 
-  /**
-   * For parameters and semantics, see WeirdoCustomDigits::customFromHex().
-   */
+  /** For parameters and semantics, see WeirdoCustomDigits::customFromHex(). */
 	public function customFromHex( $hexNumber, $minCustomDigits=1 ) {
 		// convert hex numbers to decimal for bc
 		return $this->customFromInternal( hexdec( $hexNumber ), $minCustomDigits );
 	}
 
-  /**
-   * For parameters and semantics, see WeirdoCustomDigits::customFromInternal().
-   */
+  /** For parameters and semantics, see WeirdoCustomDigits::customFromInternal(). */
 	public function customFromInternal( $internal, $minCustomDigits=1 ) {
 		$digits = array();
 		while ( $internal ) {
@@ -105,9 +97,7 @@ class WeirdoCustomDigitsBc extends WeirdoCustomDigits {
 		return $customNumber;
 	}
 
-  /**
-   * For parameters and semantics, see WeirdoCustomDigits::customRandomDigits().
-   */
+  /** For parameters and semantics, see WeirdoCustomDigits::customRandomDigits(). */
 	public function customRandomDigits( $nDigits ) {
 		$range = $this->_getRangeNeededForCustomDigits( (int)$nDigits );
 		if ( $range ) {
@@ -115,9 +105,7 @@ class WeirdoCustomDigitsBc extends WeirdoCustomDigits {
 		}
 	}
 
-  /**
-   * For parameters and semantics, see WeirdoCustomDigits::customRandomFromInternalRange().
-   */
+  /** For parameters and semantics, see WeirdoCustomDigits::customRandomFromInternalRange(). */
 	public function customRandomFromInternalRange( $rangeInternal ) {
 		$numBits = $this->_getBitsNeededForRangeInternal( $rangeInternal );
 		if ( $numBits ) {
@@ -195,25 +183,19 @@ class WeirdoCustomDigitsBc extends WeirdoCustomDigits {
 	  return $sum;
 	}
 
-  /**
-   * For parameters and semantics, see WeirdoCustomDigits::decimalFromCustom().
-   */
+  /** For parameters and semantics, see WeirdoCustomDigits::decimalFromCustom(). */
 	public function decimalFromCustom( $customNumber ) {
 		// our internal format is decimal
 		return $this->internalFromCustom( $customNumber );
 	}
 
-  /**
-   * For parameters and semantics, see WeirdoCustomDigits::decimalFromInternal().
-   */
+  /** For parameters and semantics, see WeirdoCustomDigits::decimalFromInternal(). */
 	public function decimalFromInternal( $internal ) {
 		// our internal format is decimal
 		return $internal;
 	}
 
-  /**
-   * For parameters and semantics, see WeirdoCustomDigits::hexFromDecimal().
-   */
+  /** For parameters and semantics, see WeirdoCustomDigits::hexFromDecimal(). */
 	public static function hexFromDecimal( $decimalNumber ) {
 
     $hexChunks = array();
@@ -229,23 +211,17 @@ class WeirdoCustomDigitsBc extends WeirdoCustomDigits {
 		return implode( '', array_reverse( $hexChunks ) );
 	}
 
-  /**
-   * For parameters and semantics, see WeirdoCustomDigits::hexFromCustom().
-   */
+  /** For parameters and semantics, see WeirdoCustomDigits::hexFromCustom(). */
 	public function hexFromCustom( $customNumber ) {
 		return self::hexFromDecimal( $this->internalFromCustom( $customNumber ) );
 	}
 
-  /**
-   * For parameters and semantics, see WeirdoCustomDigits::hexFromInternal().
-   */
+  /** For parameters and semantics, see WeirdoCustomDigits::hexFromInternal(). */
 	public function hexFromInternal( $internal ) {
 		return self::hexFromDecimal( $internal );
 	}
 
-  /**
-   * For parameters and semantics, see WeirdoCustomDigits::internalFromCustom().
-   */
+  /** For parameters and semantics, see WeirdoCustomDigits::internalFromCustom(). */
 	public function internalFromCustom( $customNumber ) {
 		$sum = 0;
 		$digits = array_reverse( $this->str_split( $customNumber ) );
@@ -264,23 +240,18 @@ class WeirdoCustomDigitsBc extends WeirdoCustomDigits {
 		return $sum;
 	}
 
-  /**
-   * For parameters and semantics, see WeirdoCustomDigits::internalFromDecimal().
-   */
+  /** For parameters and semantics, see WeirdoCustomDigits::internalFromDecimal(). */
 	public function internalFromDecimal( $decimalNumber ) {
 		// our internal format is a decimal string
 		return "$decimalNumber";
 	}
 
-  /**
-   * For parameters and semantics, see WeirdoCustomDigits::internalFromHex().
-   */
+  /** For parameters and semantics, see WeirdoCustomDigits::internalFromHex(). */
 	public function internalFromHex( $hexNumber ) {
 		return self::decimalFromHex( $hexNumber );
 	}
 
-  /**
-   * For parameters and semantics, see WeirdoCustomDigits::_getBitsNeededForRangeInternal().
+  /** For parameters and semantics, see WeirdoCustomDigits::_getBitsNeededForRangeInternal().
    * @private
    */
 	protected function _getBitsNeededForRangeInternal( $rangeInternal ) {
@@ -291,8 +262,7 @@ class WeirdoCustomDigitsBc extends WeirdoCustomDigits {
 		return $this->_bitsNeededForRange[$rangeInternal];
 	}
 
-  /**
-   * For parameters and semantics, see WeirdoCustomDigits::_getRangeNeededForCustomDigits().
+  /** For parameters and semantics, see WeirdoCustomDigits::_getRangeNeededForCustomDigits().
    * @private
    */
   protected function _getRangeNeededForCustomDigits( $nDigits ) {
@@ -303,8 +273,7 @@ class WeirdoCustomDigitsBc extends WeirdoCustomDigits {
     return $this->_rangeNeededForDigits[$nDigits];
   }
 
-  /**
-   * For semantics, see WeirdoCustomDigits::_initStatic().
+  /** For semantics, see WeirdoCustomDigits::_initStatic().
    * @private
    */
 	public static function _initStatic() {

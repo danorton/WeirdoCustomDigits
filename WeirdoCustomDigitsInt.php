@@ -152,8 +152,7 @@ class WeirdoCustomDigitsInt extends WeirdoCustomDigits {
 		return $random;
 	}
 
-  /**
-   * For parameters and semantics, see WeirdoCustomDigits::_getBitsNeededForRangeInternal().
+  /** For parameters and semantics, see WeirdoCustomDigits::_getBitsNeededForRangeInternal().
    * @private
    */
 	protected function _getBitsNeededForRangeInternal( $rangeInternal ) {
@@ -167,8 +166,7 @@ class WeirdoCustomDigitsInt extends WeirdoCustomDigits {
 		return $this->_bitsNeededForRange[$rangeInternal];
 	}
 
-  /**
-   * For parameters and semantics, see WeirdoCustomDigits::_getRangeNeededForCustomDigits().
+  /** For parameters and semantics, see WeirdoCustomDigits::_getRangeNeededForCustomDigits().
    * @private
    */
 	protected function _getRangeNeededForCustomDigits( $nDigitsDecimal ) {
@@ -183,8 +181,7 @@ class WeirdoCustomDigitsInt extends WeirdoCustomDigits {
 		return $this->_rangeNeededForDigits[$nDigitsDecimal];
 	}
 
-  /**
-   * For semantics, see WeirdoCustomDigits::_initStatic().
+  /** For semantics, see WeirdoCustomDigits::_initStatic().
    * @private
    */
 	public static function _initStatic() {
