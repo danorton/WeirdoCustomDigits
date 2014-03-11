@@ -150,7 +150,7 @@ foreach (array('Int', 'Gmp', 'Bc') as $mathType) {
 	foreach ($randomNumberSets as $randomNumbers) {
 		$startTime = microtime(TRUE);
 		for ( $i = 0; $i<count($randomNumbers); $i++) {
-			$decimal = $randomNumbers[$i];
+			$decimal = (string)$randomNumbers[$i];
 			$number = $wrdx51->customFromDecimal($decimal);
 			if ((count($randomNumbers) - $i) < 10) printf("%s", $number);
 			$decimalInverse = $wrdx51->decimalFromCustom($number);
@@ -165,6 +165,20 @@ foreach (array('Int', 'Gmp', 'Bc') as $mathType) {
 			  if ((count($randomNumbers) - $i) < 10) printf("/?? ");
 				$customResults[$decimal] = $number;
 			}
+
+			//printf("\$i=%u; \$decimal='%s'\n", $i, $decimal);
+			// go to hex and back
+			$hex = $className::hexFromDecimal($decimal);
+			//printf("\$hex='%s'\n", $hex);
+			//printf("hinverse='%s'\n", "".$className::decimalFromHex($hex));
+			assert("$decimal" === ("".$className::decimalFromHex($hex)));
+
+			// go to binary and back
+			$bin = $className::binFromDecimal($decimal);
+			//printf("\$bin='%s'\n", $bin);
+			//printf("binverse='%s'\n", "".$className::decimalFromBin($bin));
+			assert("$decimal" === ("".$className::decimalFromBin($bin)));
+
 		}
 		printf("\n%s ms\n", intval((microtime(TRUE) - $startTime)*1000000)/1000);
 	}

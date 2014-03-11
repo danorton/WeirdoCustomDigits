@@ -590,11 +590,11 @@ abstract class WeirdoCustomDigits {
 	protected $_rangeNeededForDigits;
 
 	/**
-	 * Number of bits by range of numbers.
+	 * Array of number of bits by range of numbers.
 	 *
 	 * This is an array that maps a range of numbers to the number of bits required to
 	 * represent any number in that range. (Actually stored is the limit of the range,
-	 * which starts at zero and ends at one less than the limit.)
+	 * log2(n), which starts at zero and ends at one less than the limit.)
 	 */
 	protected $_bitsNeededForRange;
 

@@ -53,6 +53,7 @@ ALIASES =	"type{1}=<b> \1 </b>:" \
 		"access=\par Access:\n" \
 		"private=\access private" \
 		"protected=\access protected" \
+		"abstract=\access abstract" \
 		"public=\access public" \
 		"license=\note" \
 		"copyright=\note" \
