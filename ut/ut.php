@@ -63,10 +63,17 @@ $randomDecimalStrings[] = PHP_INT_MAX . PHP_INT_MAX . PHP_INT_MAX;
 
 $failures = array();
 $customResults = array();
+$debug = 0;
 
-foreach (array('Int', 'Gmp', 'Bc') as $mathType) {
+if (isset($argv[1]) && ($argv[1] === '--debug')) {
+	array_splice( $argv, 1, 1 );
+	$debug++;
+}
+
+//foreach (array('Int', 'Gmp', 'Bc') as $mathType) {
 //foreach (array('Int', 'Bc') as $mathType) {
 //foreach (array('Bc', 'Int') as $mathType) {
+foreach (array('Bc', 'Int', 'Gmp') as $mathType) {
 	echo "===== mathType=$mathType ======\n";
 	$className = "WeirdoCustomDigits$mathType";
 	echo "===== class=$className ======\n";
@@ -166,17 +173,17 @@ foreach (array('Int', 'Gmp', 'Bc') as $mathType) {
 				$customResults[$decimal] = $number;
 			}
 
-			//printf("\$i=%u; \$decimal='%s'\n", $i, $decimal);
+			$debug && printf("\$i=%u; \$decimal='%s'\n", $i, $decimal);
 			// go to hex and back
 			$hex = $className::hexFromDecimal($decimal);
-			//printf("\$hex='%s'\n", $hex);
-			//printf("hinverse='%s'\n", "".$className::decimalFromHex($hex));
+			$debug && printf("\$hex='%s'\n", $hex);
+			$debug && printf("hinverse='%s'\n", "".$className::decimalFromHex($hex));
 			assert("$decimal" === ("".$className::decimalFromHex($hex)));
 
 			// go to binary and back
 			$bin = $className::binFromDecimal($decimal);
-			//printf("\$bin='%s'\n", $bin);
-			//printf("binverse='%s'\n", "".$className::decimalFromBin($bin));
+			0 && $debug && printf("\$bin='%s'\n", $bin);
+			0 && $debug && printf("binverse='%s'\n", "".$className::decimalFromBin($bin));
 			assert("$decimal" === ("".$className::decimalFromBin($bin)));
 
 		}
