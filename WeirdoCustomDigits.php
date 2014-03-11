@@ -2,21 +2,75 @@
 /**
  * @addtogroup WeirdoCustomDigits
  *
- * These PHP classes convert custom numbers with arbitrary
- * radixes and digit characters.  The digits of a custom number can
- * be any Unicode character, not just ASCII alphanumerics. The bc-
- * and gmp-based implementations (WeirdoCustomDigitsBc and
- * WeirdoCustomDigitsGmp) remove the limitation on the ranges of
- * numeric values. Finally, there is no practical limit on the
- * radix, provided each digit in the radix can be represented by a
- * different Unicode character. The classes also provide methods
- * for producing random numbers of uniform distribution, expressed
- * as a custom number.
+ * This module provides the WeirdoCustomDigits abstract PHP class and implementation subclasses,
+ * which perform radix conversion on numbers with arbitrary digits. The digits of a such a
+ * **custom number** can be any Unicode character, and is not limited to ASCII alphanumerics.
+ * 
+ * For example, a base-4 custom number could have the digits, "X", "Y", "Z" & "T", where "X"
+ * represents zero (decimal "0"), "Y" represents unity (decimal "1"), "Z" represents the
+ * next natural digit (decimal "2") &c. The decimal number 105 expressed as such a custom
+ * number would be "YZZY". Expanding the digits as a polynomial produces
  *
- * For example, the included base-70 custom number set,
- * WeirdoCustomDigits::DIGITS_70, includes all of the base62 digits
- * (0-9, a-z, A-Z), but adds eight ASCII symbols. Such a base-70
- * number could contain millions of digits!
+ *  - "Y"×4³ + "Z"×4² + "Z"×4¹ + "Y"×5⁰ = 1×64 + 2×16 + 2×4 + 1×1 = 105
+ *
+ * As "X" is the zero digit, it can be repeated any number of times before a number, just
+ * as with leading decimal zeros before a decimal number. For example, "YZZY" is numerically
+ * identical to "XYZZY".
+ *
+ * Code example:
+ * @code{.php}
+ * require_once('WeirdoCustomDigitsInt.php');
+ * $converter = WeirdoCustomDigitsInt('XYZT');
+ * $number = $converter->customFromDecimal(105);
+ * var_dump($number);
+ * @endcode
+ * Output:
+ * @code
+ * string(4) "YZZY"
+ * @endcode
+ *
+ * When working with numbers from bases in the range from 2 to 36, it might be more practical to
+ * use the PHP function <a href="http://php.net/base_convert">base_convert()</a> and then
+ * substitute the characters using <a href="http://php.net/base_convert">str_replace()</a>. (If
+ * the gmp extension is available, you could do a similar conversion for bases up to base 62.)
+ * Consequently, this module is more practical for number bases above 36 (or above base 62, if gmp
+ * is available).
+ *
+ * Otherwise, there is no practical limit on the radix, provided each digit in the radix can be
+ * represented by a different Unicode character.
+ *
+ * There is one important limitation on numbers: <b>Only non-negative integers are supported by this
+ * module</b>.
+ *
+ * @section subclasses Implementation subclasses
+ *
+ * The WeirdoCustomDigitsInt subclass implements the functions using basic PHP arithmetic.
+ * It is limited to numbers that range from zero to the smaller of:
+ *   -# @b PHP_INT_MAX and
+ *   -# The maximum of the contiguous set of integers that can be expressed as a float.
+ *
+ * Typical PHP implementations use IEEE 754 for implementing floating point numbers, so the
+ * typical limit for 32-bit environments is 2³¹ (0x7FFFFFFF) and for 64-bit environments, the
+ * limit is 2⁵³ (0x1FFFFFFFFFFFF).
+ *
+ * The bc- and gmp-based implementations (WeirdoCustomDigitsBc and WeirdoCustomDigitsGmp) remove
+ * the limitation on the ranges of numeric values.
+ *
+ * The classes also provide methods for producing random numbers of uniform distribution,
+ * expressed as a custom number.
+ *
+ * The module provides several pre-defined radix sets:
+ *   - WeirdoCustomDigits::DIGITS_70 - Digits for radixes up to base 70 (compatible with @b base_convert and gmp up to base 36)
+ *   - WeirdoCustomDigits::DIGITS_62_GMP - Digits for radixes up to base 62 (compatible with gmp from base 37 to base 62)
+ *   - WeirdoCustomDigits::DIGITS_10_ARABIC_EAST - The Eastern Arabic numerals (٠١٢٣٤٥٦٧٨٩).
+ *   - WeirdoCustomDigits::DIGITS_51_READABLE - digits that are less likely to be confused with other digits.
+ *
+ * @section Requirements
+ *  - PHP 5.3 or later
+ *  - If using multi-byte or UTF-8 digits, PCRE UTF-8 support is required.
+ *
+ * @section Limitations
+ *  - Only non-negative integers ("whole numbers") are supported.
  * @{
  *
  * @file
@@ -37,12 +91,6 @@
 /**
  * Abstract class for converting custom numbers with arbitrary radixes and digit characters
  *
- * @section Requirements
- *  - PHP 5.3 or later
- *  - If using multi-byte or UTF-8 digits, PCRE UTF-8 support is required.
- *
- * @section Limitations
- *  - Only non-negative integers ("whole numbers") are supported.
  */
 abstract class WeirdoCustomDigits {
 

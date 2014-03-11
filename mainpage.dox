@@ -1,7 +1,15 @@
 /**
  * @mainpage
  *
- * This module provides the WeirdoCustomDigits PHP class.
+ * This module provides the abstract @ref WeirdoCustomDigits PHP class and implementation
+ * subclasses, which perform radix conversion on numbers with arbitrary digits. Details are
+ * in the documentation for the @ref WeirdoCustomDigits module.
+ *
+ * This source is available at <a href="https://github.com/danorton/WeirdoCustomDigits">GitHub</a>.
+ * To fetch it using git:
+ * @code
+ * git clone 'https://github.com/danorton/WeirdoCustomDigits.git'
+ * @endcode
  *
  * @copyright
  *   © 2014 Daniel Norton d/b/a WeirdoSoft - http://weirdosoft.com
