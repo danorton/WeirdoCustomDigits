@@ -17,7 +17,15 @@ Mountain View, California, 94041, USA.
 
 # Releases
 
- - **PENDING** 1.0.1 - bug fixes & maintenance
+ - **PENDING** 1.0.1 - enhancements, bug fixes & miscellaneous maintenance
+   - Enhancements:
+     - #7 - Remove limit of $nDigits in WeirdoCustomDigitsInt::customRandomDigits()
+             - When the parameter $allowOverflow is true, this method will allow the
+               number of digits requested to be unlimited. The default and prior behavior
+               was to throw an exception if the number of requested digits could produce
+               a value that was outside the supported numerical range. This is only relevant
+               to the WeirdoCustomDigitsInt implementation subclass, as the other
+               subclasses have no limit on the numerical range.
    - Bugs fixed:
      - #1 - customRandomDigits() method returns fewer than $nDigits characters
 
