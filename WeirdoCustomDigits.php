@@ -11,7 +11,7 @@
  * next natural digit (decimal "2") &c. The decimal number 105 expressed as such a custom
  * number would be "YZZY". Expanding the digits as a polynomial produces
  *
- *  -<span style="font-size: 150%">"Y"×4³ + "Z"×4² + "Z"×4¹ + "Y"×5⁰ = 1×64 + 2×16 + 2×4 + 1×1 = 105</span>
+ *  -<span style="font-size: 150%">"Y"×4³ + "Z"×4² + "Z"×4¹ + "Y"×4⁰ = 1×64 + 2×16 + 2×4 + 1×1 = 105</span>
  *
  * As "X" is the zero digit, it can be repeated any number of times before a number, just
  * as with leading decimal zeros before a decimal number. For example, "YZZY" is numerically
