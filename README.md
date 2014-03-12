@@ -17,6 +17,10 @@ Mountain View, California, 94041, USA.
 
 # Releases
 
+ - **PENDING** 1.0.1 - bug fixes & maintenance
+   - Bugs fixed:
+     - #1 - customRandomDigits() method returns fewer than $nDigits characters
+
  - 1.0.0 - initial release
    - Seems to work
    - API documented in Doxygen
