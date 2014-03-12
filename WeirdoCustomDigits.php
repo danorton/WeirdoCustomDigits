@@ -508,10 +508,19 @@ abstract class WeirdoCustomDigits {
 	/**
 	 * Get a specified number of random custom-number digits
 	 *
-	 * @param[in] int     $nDigits the number of random digits to obtain
+	 * @param[in] int     $nDigits the number of random digits to obtain. This method does not
+	 *                             any limit on this value.
+	 * @param[in] bool    $allowOverflow if @c true, the number of digits requested might produce
+	 *                                   a number that would exceed the supported numeric range.
+	 *                                   If this parameter is @c false and the number of digits
+	 *                                   requested could produce a number outside the supported
+	 *                                   numeric range, this method throws an ErrorException.
+	 *                                   (This parameter is ignored by implementation subclasses
+	 *                                   that do not impose a limit on the numeric range.)
+	 *                                   Default is @c false.
 	 * @returns           string of custom-number digits
 	 */
-	abstract public function customRandomDigits( $nDigits ) ;
+	abstract public function customRandomDigits( $nDigits, $allowOverflow = false ) ;
 
 	/**
 	 * Get a random custom number within specified range

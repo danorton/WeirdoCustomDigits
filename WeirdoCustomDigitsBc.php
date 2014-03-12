@@ -98,21 +98,15 @@ class WeirdoCustomDigitsBc extends WeirdoCustomDigits {
 	}
 
 	/** For parameters and semantics, see WeirdoCustomDigits::customRandomDigits(). */
-	public function customRandomDigits( $nDigits ) {
-		$range = $this->_getRangeNeededForCustomDigits( (int)$nDigits ) ;
-		if ( $range ) {
-			$result = $this->customRandomFromInternalRange( $range ) ;
-			$needDigits = $nDigits - strlen( $result ) ;
-			if ( $needDigits > 0 ) {
-				$result = str_repeat( $this->_digitsArray[0], $needDigits ) . $result ;
-			}
-			return $result ;
+	public function customRandomDigits( $nDigits, $allowOverflow = false ) {
+		$result = $this->customRandomFromInternalRange(
+			$this->_getRangeNeededForCustomDigits( (int)$nDigits )
+		);
+		$needDigits = $nDigits - strlen( $result ) ;
+		if ( $needDigits > 0 ) {
+			$result = str_repeat( $this->_digitsArray[0], $needDigits ) . $result ;
 		}
-		else {
-			throw new ErrorException(
-				sprintf( 'Error detected by %s(): $nDigits exceeds numerical range', __METHOD__ )
-			) ;
-		}
+		return $result ;
 	}
 
 	/** For parameters and semantics, see WeirdoCustomDigits::customRandomFromInternalRange(). */

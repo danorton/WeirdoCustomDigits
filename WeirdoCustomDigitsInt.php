@@ -41,6 +41,12 @@ class WeirdoCustomDigitsInt extends WeirdoCustomDigits {
 	 */
 	public static $maximumValue ;
 
+	/** For parameters and semantics, see WeirdoCustomDigits::init(). */
+	public function init( $digits = null, $radix = null, $use_uc = true ) {
+		parent::init( $digits, $radix, $use_uc ) ;
+		$this->_maxCustomRandomDigits = (int) ( log( self::$maximumValue + 1 ) / log( $this->_radix ) ) ;
+	}
+ 
 	/** For parameters and semantics, see WeirdoCustomDigits::binFromDecimal(). */
 	public static function binFromDecimal( $decimalNumber ) {
 		return decbin( $decimalNumber ) ;
@@ -130,21 +136,41 @@ class WeirdoCustomDigitsInt extends WeirdoCustomDigits {
 	}
 
 	/** For parameters and semantics, see WeirdoCustomDigits::customRandomDigits(). */
-	public function customRandomDigits( $nDigits ) {
-		$range = $this->_getRangeNeededForCustomDigits( (int)$nDigits ) ;
-		if ( $range ) {
-			$result = $this->customRandomFromInternalRange( $range ) ;
-			$needDigits = $nDigits - strlen( $result ) ;
-			if ( $needDigits > 0 ) {
-				$result = str_repeat( $this->_digitsArray[0], $needDigits ) . $result ;
+	public function customRandomDigits( $nDigits, $allowOverflow = false ) {
+		$result = array();
+		$chunkSize = null ;
+		$range = null ;
+		$newChunkSize = $this->_maxCustomRandomDigits ;
+		for ( $digitsRemaining = $nDigits ; $digitsRemaining > 0 ; $digitsRemaining -= $chunkSize ) {
+			if ( $digitsRemaining <= $this->_maxCustomRandomDigits ) {
+				$newChunkSize = $digitsRemaining ;
 			}
-			return $result ;
+			if ( $newChunkSize !== $chunkSize ) {
+				$chunkSize = $newChunkSize ;
+				$range = $this->_getRangeNeededForCustomDigits( $chunkSize ) ;
+			}
+			$chunk = $this->customRandomFromInternalRange( $range ) ;
+			$needDigits = $chunkSize - strlen( $chunk) ;
+			if ( $needDigits > 0 ) {
+				// zero-fill the result to the specified width
+				$chunk = str_repeat( $this->_digitsArray[0], $needDigits ) . $chunk ;
+			}
+			$result[] = $chunk ;
+
+			// bugbug 
+			if ( strpos( $chunk, 'Array' ) !== false ) {
+				printf("\$digitsRemaining=%s\n", $digitsRemaining) ;
+				printf("\$newChunkSize=%s\n", $newChunkSize ) ;
+				printf("\$chunkSize=%s\n", $chunkSize ) ;
+				printf("\$needDigits=%s\n", $needDigits ) ;
+				var_dump( $result ) ;
+				if ( $chunk !== '0Array' ) {
+					echo "*****\n";
+				}
+			}
+
 		}
-		else {
-			throw new ErrorException(
-				sprintf( 'Error detected by %s(): $nDigits exceeds numerical range', __METHOD__ )
-			) ;
-		}
+		return join ( '', $result ) ;
 	}
 
 	/** For parameters and semantics, see WeirdoCustomDigits::customRandomFromInternalRange(). */
@@ -201,6 +227,9 @@ class WeirdoCustomDigitsInt extends WeirdoCustomDigits {
 			throw new ErrorException( sprintf( 'Invalid invocation of %s().', __METHOD__ ) ) ;
 		}
 	}
+	
+	/** The maximum number of random custom number digits we can generate at once */
+	private $_maxCustomRandomDigits ;
 
 }
 // Once-only invocation to initialize static properties
