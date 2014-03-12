@@ -104,7 +104,6 @@ class WeirdoCustomDigitsGmp extends WeirdoCustomDigits {
 		$result = $this->customRandomFromInternalRange(
 			$this->_getRangeNeededForCustomDigits( (int)$nDigits )
 		);
-		$result = $this->customRandomFromInternalRange( $range ) ;
 		$needDigits = $nDigits - strlen( $result ) ;
 		if ( $needDigits > 0 ) {
 			$result = str_repeat( $this->_digitsArray[0], $needDigits ) . $result ;
