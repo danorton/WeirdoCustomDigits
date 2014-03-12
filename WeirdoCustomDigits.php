@@ -11,7 +11,7 @@
  * next natural digit (decimal "2") &c. The decimal number 105 expressed as such a custom
  * number would be "YZZY". Expanding the digits as a polynomial produces
  *
- *  - "Y"×4³ + "Z"×4² + "Z"×4¹ + "Y"×5⁰ = 1×64 + 2×16 + 2×4 + 1×1 = 105
+ *  -<span style="font-size: 150%">"Y"×4³ + "Z"×4² + "Z"×4¹ + "Y"×5⁰ = 1×64 + 2×16 + 2×4 + 1×1 = 105</span>
  *
  * As "X" is the zero digit, it can be repeated any number of times before a number, just
  * as with leading decimal zeros before a decimal number. For example, "YZZY" is numerically
@@ -19,10 +19,10 @@
  *
  * Code example:
  * @code{.php}
- * require_once('WeirdoCustomDigitsInt.php');
- * $converter = WeirdoCustomDigitsInt('XYZT');
- * $number = $converter->customFromDecimal(105);
- * var_dump($number);
+ * require_once('WeirdoCustomDigitsInt.php') ;
+ * $converter = WeirdoCustomDigitsInt('XYZT') ;
+ * $number = $converter->customFromDecimal(105) ;
+ * var_dump($number) ;
  * @endcode
  * Output:
  * @code
@@ -95,40 +95,40 @@
 abstract class WeirdoCustomDigits {
 
 	/** Class version */
-	const VERSION = '1.0.0';
+	const VERSION = '1.0.0' ;
 
-	/** Digits for radixes up to base 70 (including bc and gmp up to base 36) */
-	const DIGITS_70 =     '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_.*~!()-';
+	/** Digits for radixes up to base 70 (compatible with base_convert and gmp up to base 36) */
+	const DIGITS_70 =     '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_.*~!()-' ;
 
 	/** Digits compatibile with gmp from base 37 to base 62 */
-	const DIGITS_62_GMP = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+	const DIGITS_62_GMP = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz' ;
 
 	/** Digits up to base 51 less likely to be misread
 	 *  These consists of a subset of the typical base-62 digits, less these eleven digits:
 	 *  0O 1Ll 2Z 5S 8B
 	 */
-	const DIGITS_51_READABLE = 'wkW34679AabCcDdEeFfGgHhiJjKLMmNnoPpQqRrsTtUuVvXxYyz';
+	const DIGITS_51_READABLE = 'wkW34679AabCcDdEeFfGgHhiJjKLMmNnoPpQqRrsTtUuVvXxYyz' ;
 
 	/** Arabic decimal digits (UTF-8) */
-	const DIGITS_10_ARABIC_EAST = '٠١٢٣٤٥٦٧٨٩';
+	const DIGITS_10_ARABIC_EAST = '٠١٢٣٤٥٦٧٨٩' ;
 
 	/** Precision of IEEE 754 floating point number */
-	const IEEE_754_SIGNIFICAND_BITS = 53;
+	const IEEE_754_SIGNIFICAND_BITS = 53 ;
 
 	/** Set to @c true only if openssl random is not crypto safe */
-	public $allowNonCryptoRandom;
+	public $allowNonCryptoRandom ;
 
 	/** Maximum of contiguous range of integers that PHP supports for arithmetic */
-	public static $phpIntegerMaxBits = WeirdoCustomDigits::IEEE_754_SIGNIFICAND_BITS;
+	public static $phpIntegerMaxBits = WeirdoCustomDigits::IEEE_754_SIGNIFICAND_BITS ;
 
 	/**
 	 * The maximum value of a number
 	 *
 	 * If not set or @c null, there is no practical limit. Otherwise, this is the internally
 	 * represented maximum number allowed. For the integer subclass WeirdoCustomDigitsInt,
-	 * for example, this value is PHP_INT_MAX;
+	 * for example, this value is PHP_INT_MAX ;
 	 */
-	public static $maximumValue = null;
+	public static $maximumValue = null ;
 
 	/**
 	 * Class constructor
@@ -147,13 +147,13 @@ abstract class WeirdoCustomDigits {
 	 * @b Example:
 	 * @code
 	 * // Manipulate base-65 numbers that have the digits [0-9a-zA-Z_.*].
-	 * $wrdx = new WeirdoCustomDigitInt(WeirdoCustomDigits::DIGITS_70,65);
+	 * $wrdx = new WeirdoCustomDigitInt(WeirdoCustomDigits::DIGITS_70,65) ;
 	 * @endcode
 	 */
 	public function __construct( $digits = null, $radix = null, $use_uc = true ) {
-		$this->allowNonCryptoRandom = false;
+		$this->allowNonCryptoRandom = false ;
 		// set the parameter-variant instance properties (which can be changed, later)
-		$this->init( $digits, $radix, $use_uc );
+		$this->init( $digits, $radix, $use_uc ) ;
 	}
 
 	/**
@@ -168,34 +168,34 @@ abstract class WeirdoCustomDigits {
 
 		// set default character set for the digits
 		if ( $digits === null ) {
-			$digits = self::DIGITS_70;
+			$digits = self::DIGITS_70 ;
 		}
 
 		// clear properties built with different parameters
-		$this->_rangeNeededForDigits = array();
-		$this->_bitsNeededForRange = array();
-		$this->_randomBitsNeeded = array();
+		$this->_rangeNeededForDigits = array() ;
+		$this->_bitsNeededForRange = array() ;
+		$this->_randomBitsNeeded = array() ;
 
 		// use unicode if requested
-		$this->_is_using_uc = $use_uc;
+		$this->_is_using_uc = $use_uc ;
 		if ( $this->_is_using_uc ) {
 			$this->_fn['str_split'] =
 				function( $str ) {
-					return WeirdoCustomDigits::uc_str_split( $str );
-				};
+					return WeirdoCustomDigits::uc_str_split( $str ) ;
+				} ;
 		} else {
 			// support single-byte characters, only
 			$this->_fn['str_split'] =
 				function( $str ) {
-					return str_split( $str );
-				};
+					return str_split( $str ) ;
+				} ;
 		}
 
 		// get the digits as an array ( if not given an array )
 		if ( is_array( $digits ) ) {
-			$digitsArray = $digits;
+			$digitsArray = $digits ;
 		} else {
-			$digitsArray = $this->str_split( $digits );
+			$digitsArray = $this->str_split( $digits ) ;
 		}
 
 		// get the ordinal value of each digit (performance shortcut)
@@ -205,35 +205,35 @@ abstract class WeirdoCustomDigits {
 			array_flip(
 				array_map(
 					function ( $digit ) {
-						return "#$digit";
+						return "#$digit" ;
 					},
 						$digitsArray
 					)
-			);
+			) ;
 
 		// verify that each digit is unique
 		if ( count( $digitsArray ) != count( $digitValues ) ) {
 			throw new ErrorException(
 				sprintf( 'Error detected by %s(): radix digits are not all unique.', __METHOD__ )
-			);
+			) ;
 		}
 
 		// get the radix, if not already set
 		if ( $radix === null ) {
-			$radix = count( $digitValues );
+			$radix = count( $digitValues ) ;
 		}
 
 		// verify that radix is in range for the given digits
 		if ( $radix < 1 || $radix > count( $digitValues ) ) {
 			throw new ErrorException(
 				sprintf( 'Error detected by %s(): radix is out of range of available digits.', __METHOD__ )
-			);
+			) ;
 		}
 
 		// set properties
-		$this->_digitsArray = array_slice( $digitsArray, 0, $radix );
-		$this->_digitValues = array_slice( $digitValues, 0, $radix );
-		$this->_radix = $radix;
+		$this->_digitsArray = array_slice( $digitsArray, 0, $radix ) ;
+		$this->_digitValues = array_slice( $digitValues, 0, $radix ) ;
+		$this->_radix = $radix ;
 
 	}
 
@@ -250,7 +250,7 @@ abstract class WeirdoCustomDigits {
 				sprintf( 'Error detected by %s(): digit is not in the set of custom digits ( %s ).',
 					__METHOD__, $customNumberDigit
 				)
-			);
+			) ;
 		}
 	}
 
@@ -265,7 +265,7 @@ abstract class WeirdoCustomDigits {
 	 */
 	public function validateCustomNumber( $customNumber ) {
 		foreach ( $this->str_split( $customNumber ) as $digit ) {
-			$this->validateCustomDigit( $digit );
+			$this->validateCustomDigit( $digit ) ;
 		}
 	}
 
@@ -279,7 +279,7 @@ abstract class WeirdoCustomDigits {
 	public static function binFromDecimal( $decimalNumber ) {
 		throw new ErrorException(
 			sprintf( 'Error detected by %s(): unimplemented abstract function invoked.', __METHOD__ )
-		);
+		) ;
 	}
 
 	/**
@@ -295,7 +295,7 @@ abstract class WeirdoCustomDigits {
 
 		// trim leading zeros
 		if ( $hexNumber[0] === '0' ) {
-			$hexNumber = ltrim( $hexNumber, '0' );
+			$hexNumber = ltrim( $hexNumber, '0' ) ;
 			if ( $hexNumber === '' ) {
 				return '0'; // quick exit for the degenerate case
 			}
@@ -305,13 +305,13 @@ abstract class WeirdoCustomDigits {
 		$hexChunks = str_split( strrev($hexNumber), self::$_hexbinChunkSize ) ;
 
 		// convert the highest-order chunk to binary and put into the first element of an array
-		$binaryChunks = array( decbin( hexdec( strrev( array_pop( $hexChunks ) ) ) ) );
+		$binaryChunks = array( decbin( hexdec( strrev( array_pop( $hexChunks ) ) ) ) ) ;
 
 		// convert and pad the remaining hex chunks to equal-length binary chunks
 		while ( count( $hexChunks ) ) {
 			$binaryChunks[] = sprintf(self::$_binChunkPaddingFormat, // left zero pad
 					decbin( hexdec( strrev( array_pop( $hexChunks ) ) ) )
-				);
+				) ;
 		}
 
 		// join all the binary chunks into a string
@@ -328,7 +328,7 @@ abstract class WeirdoCustomDigits {
 	 *                        (Note that a zero isn't necessarily the ASCII character '0'!)
 	 * @returns               custom-number string of custom digit characters
 	 */
-	abstract public function customFromDecimal($decimalNumber, $minCustomDigits=1 );
+	abstract public function customFromDecimal($decimalNumber, $minCustomDigits=1 ) ;
 
 	/**
 	 * Convert a hexadecimal number to a custom-number string.
@@ -338,7 +338,7 @@ abstract class WeirdoCustomDigits {
 	 *                    (Note that a zero isn't necessarily the ASCII character '0'!)
 	 * @returns           custom-number string of custom digit characters
 	 */
-	abstract public function customFromHex( $hexNumber, $minCustomDigits=1 );
+	abstract public function customFromHex( $hexNumber, $minCustomDigits=1 ) ;
 
 	/**
 	 * Convert an internally represented number to a custom-number string.
@@ -348,7 +348,7 @@ abstract class WeirdoCustomDigits {
 	 *                    (Note that a zero isn't necessarily the ASCII character '0'!)
 	 * @returns           custom-number string of custom digit characters
 	 */
-	abstract public function customFromInternal( $internal, $minCustomDigits=1 );
+	abstract public function customFromInternal( $internal, $minCustomDigits=1 ) ;
 
 	/**
 	 * Convert a binary-number string to a decimal-number string
@@ -360,7 +360,7 @@ abstract class WeirdoCustomDigits {
 	public static function decimalFromBin( $binNumber ) {
 		throw new ErrorException(
 			sprintf( 'Error detected by %s(): unimplemented abstract function invoked.', __METHOD__ )
-		);
+		) ;
 	}
 
 	/**
@@ -370,12 +370,12 @@ abstract class WeirdoCustomDigits {
 	 * @param[in] string  $customNumber a custom-number string
 	 * @returns           decimal-number string of decimal digits
 	 */
-	abstract public function decimalFromCustom( $customNumber );
+	abstract public function decimalFromCustom( $customNumber ) ;
 
 	public static function decimalFromHex( $hexNumber ) {
 		throw new ErrorException(
 			sprintf( 'Error detected by %s(): unimplemented abstract function invoked.', __METHOD__ )
-		);
+		) ;
 	}
 
 	/**
@@ -384,7 +384,7 @@ abstract class WeirdoCustomDigits {
 	 * @param[in] any     $internal a value returned from another method (e.g. from internalFrom...())
 	 * @returns           decimal-number string of decimal digits
 	 */
-	abstract public function decimalFromInternal( $internal );
+	abstract public function decimalFromInternal( $internal ) ;
 
 	/**
 	 * Convert a binary-number string to a hexadecimal string
@@ -399,7 +399,7 @@ abstract class WeirdoCustomDigits {
 
 		// trim leading zeros
 		if ( $binNumber[0] === '0' ) {
-			$binNumber = ltrim( $binNumber, '0' );
+			$binNumber = ltrim( $binNumber, '0' ) ;
 			if ( $binNumber === '' ) {
 				return '0';   // quick exit for the degenerate case
 			}
@@ -409,13 +409,13 @@ abstract class WeirdoCustomDigits {
 		$binChunks = str_split( strrev($binNumber), self::$_binhexChunkSize ) ;
 
 		// convert the highest-order chunk to hex and put into the first element of an array
-		$hexChunks = array( dechex( bindec( strrev( array_pop( $binChunks ) ) ) ) );
+		$hexChunks = array( dechex( bindec( strrev( array_pop( $binChunks ) ) ) ) ) ;
 
 		// convert and pad the remaining binary chunks to equal-length hex chunks
 		while ( count( $binChunks ) ) {
 			$hexChunks[] = sprintf(self::$_hexChunkPaddingFormat, // left zero pad
 					dechex( bindec( strrev( array_pop( $binChunks ) ) ) )
-				);
+				) ;
 		}
 		// join all the hex chunks into a string
 		return join( '', $hexChunks ) ;
@@ -427,7 +427,7 @@ abstract class WeirdoCustomDigits {
 	 * @param[in] string  $customNumber custom-number string
 	 * @returns           hexadecimal string
 	 */
-	abstract public function hexFromCustom( $customNumber );
+	abstract public function hexFromCustom( $customNumber ) ;
 
 	/**
 	 * Convert a decimal-number string to a hexadecimal string
@@ -439,7 +439,7 @@ abstract class WeirdoCustomDigits {
 	public static function hexFromDecimal( $decimalNumber ) {
 		throw new ErrorException(
 			sprintf( 'Error detected by %s(): unimplemented abstract function invoked.', __METHOD__ )
-		);
+		) ;
 	}
 
 	/**
@@ -448,7 +448,7 @@ abstract class WeirdoCustomDigits {
 	 * @param[in] any     $internal a value returned from another method (e.g. from internalFrom...())
 	 * @returns           hexadecimal string of hexadecimal digits
 	 */
-	abstract public function hexFromInternal( $internal );
+	abstract public function hexFromInternal( $internal ) ;
 
 	/**
 	 * Convert a custom-number string to an internally represented (opaque) number
@@ -456,7 +456,7 @@ abstract class WeirdoCustomDigits {
 	 * @param[in] string  $customNumber custom-number string
 	 * @returns           internally represented (opaque) number
 	 */
-	abstract public function internalFromCustom( $customNumber );
+	abstract public function internalFromCustom( $customNumber ) ;
 
 	/**
 	 * Convert a decimal-number string to an internally represented (opaque) number
@@ -464,7 +464,7 @@ abstract class WeirdoCustomDigits {
 	 * @param[in] int|string  $decimalNumber integer or string of decimal digits [0-9]. e.g. '139874'
 	 * @returns           internally represented (opaque) number
 	 */
-	abstract public function internalFromDecimal( $decimalNumber );
+	abstract public function internalFromDecimal( $decimalNumber ) ;
 
 	/**
 	 * Convert a hexadecimal string to an internally represented (opaque) number
@@ -472,7 +472,7 @@ abstract class WeirdoCustomDigits {
 	 * @param[in] string  $hexNumber string of hexadecimal digits [0-9a-fA-F]. Example: 'F3E8'
 	 * @returns           internally represented (opaque) number
 	 */
-	abstract public function internalFromHex( $hexNumber );
+	abstract public function internalFromHex( $hexNumber ) ;
 
 	/**
 	 * Get random bits, represented as a hexadecimal string
@@ -487,22 +487,22 @@ abstract class WeirdoCustomDigits {
 	 */
 	public function hexFromRandomBits( $nBits ) {
 		// fetch random bytes
-		$bits = openssl_random_pseudo_bytes( ( $nBits + 7 ) >> 3, $crypto );
+		$bits = openssl_random_pseudo_bytes( ( $nBits + 7 ) >> 3, $crypto ) ;
 		if ( !$crypto && !$this->allowNonCryptoRandom ) {
 			throw new ErrorException(
 				sprintf( 'Error detected by %s(): PHP lacks crypto-quality random generator.',
 					__METHOD__, $customNumberDigit
 				)
-			);
+			) ;
 		}
 		// knock off the unwanted bits
-		$maskBits = ($nBits & 7);
+		$maskBits = ($nBits & 7) ;
 		if ( $maskBits ) {
-			$bits[0] = chr( ord( $bits[0] ) & ( ( 1 << $maskBits ) - 1 ) );
+			$bits[0] = chr( ord( $bits[0] ) & ( ( 1 << $maskBits ) - 1 ) ) ;
 		}
 
 		// return the hex result
-		return bin2hex( $bits );
+		return bin2hex( $bits ) ;
 	}
 
 	/**
@@ -511,7 +511,7 @@ abstract class WeirdoCustomDigits {
 	 * @param[in] int     $nDigits the number of random digits to obtain
 	 * @returns           string of custom-number digits
 	 */
-	abstract public function customRandomDigits( $nDigits );
+	abstract public function customRandomDigits( $nDigits ) ;
 
 	/**
 	 * Get a random custom number within specified range
@@ -520,7 +520,7 @@ abstract class WeirdoCustomDigits {
 	 *                    the range of random numbers to obtain (from zero to this number minus one)
 	 * @returns           string of custom-number digits
 	 */
-	abstract public function customRandomFromInternalRange( $rangeInternal );
+	abstract public function customRandomFromInternalRange( $rangeInternal ) ;
 
 	/**
 	 * Split a unicode string into an array of its individual characters.
@@ -530,7 +530,7 @@ abstract class WeirdoCustomDigits {
 	 * @returns           array of single-Unicode-character strings
 	 */
 	public static function uc_str_split( $str ) {
-		return preg_split( '/(?<!^)(?!$)/u', $str );
+		return preg_split( '/(?<!^)(?!$)/u', $str ) ;
 	}
 
 	/**
@@ -544,7 +544,7 @@ abstract class WeirdoCustomDigits {
 	 * @returns           array of single-character strings
 	 */
 	protected function str_split( $str ) {
-		return $this->_fn['str_split']( $str );
+		return $this->_fn['str_split']( $str ) ;
 	}
 
 	/**
@@ -557,7 +557,7 @@ abstract class WeirdoCustomDigits {
 	 * @param[in] int     $nDigits number of custom-number digits
 	 * @returns           internally represented limit value
 	 */
-	abstract protected function _getRangeNeededForCustomDigits( $nDigits );
+	abstract protected function _getRangeNeededForCustomDigits( $nDigits ) ;
 
 	/**
 	 * Get the number of binary bits needed to represent a number less than the specified limit.
@@ -565,7 +565,7 @@ abstract class WeirdoCustomDigits {
 	 * @param[in] any     $rangeInternal internally represented value of the range limit
 	 * @returns           integer number of bits needed to represent numbers in the entire range
 	 */
-	abstract protected function _getBitsNeededForRangeInternal( $rangeInternal );
+	abstract protected function _getBitsNeededForRangeInternal( $rangeInternal ) ;
 
 	/**
 	 * Trim an array, removing least-recently added elements
@@ -580,12 +580,12 @@ abstract class WeirdoCustomDigits {
 	 */
 	protected function _trim_array_lru( &$array, $maxCount, $chunkSize ) {
 		if ( count( $array ) > $maxCount ) {
-			$chunkLeft = $chunkSize;
+			$chunkLeft = $chunkSize ;
 			// ( We can't use array_splice, as it clobbers the remaining keys. )
 			foreach ( array_keys( $array ) as $k ) {
-				unset( $array[$k] );
+				unset( $array[$k] ) ;
 				if ( --$chunkLeft <= 0 ) {
-					break;
+					break ;
 				}
 			}
 		}
@@ -603,14 +603,14 @@ abstract class WeirdoCustomDigits {
 	 */
 	public static function _initStatic() {
 		if ( !self::$_hexbinChunkSize ) {
-			self::$_hexbinChunkSize = strlen(decbin(PHP_INT_MAX))>>2;
-			self::$_binhexChunkSize = self::$_hexbinChunkSize << 2;
+			self::$_hexbinChunkSize = strlen(decbin(PHP_INT_MAX))>>2 ;
+			self::$_binhexChunkSize = self::$_hexbinChunkSize << 2 ;
 			self::$_hexChunkPaddingFormat =       // printf format for hex left zero padding
-				'%0' . self::$_hexbinChunkSize . 's';
+				'%0' . self::$_hexbinChunkSize . 's' ;
 			self::$_binChunkPaddingFormat =      // printf format for binary left zero padding
-				'%0' . self::$_binhexChunkSize . 's';
+				'%0' . self::$_binhexChunkSize . 's' ;
 		} else {
-			throw new ErrorException( sprintf( 'Invalid invocation of %s().', __METHOD__ ) );
+			throw new ErrorException( sprintf( 'Invalid invocation of %s().', __METHOD__ ) ) ;
 		}
 	}
 
@@ -619,17 +619,17 @@ abstract class WeirdoCustomDigits {
 	 *
 	 * The first element is zero, the second is unity, ...
 	 */
-	protected $_digitsArray;
+	protected $_digitsArray ;
 
 	/**
 	 * An associative array that maps custom-number digits to their numerical values.
 	 */
-	protected $_digitValues;
+	protected $_digitValues ;
 
 	/**
 	 * The radix of the custom number.
 	 */
-	protected $_radix;
+	protected $_radix ;
 
 	/**
 	 * Custom number ranges by number of digits.
@@ -638,7 +638,7 @@ abstract class WeirdoCustomDigits {
 	 * representation of the limit for that number as expressed by the number of digits
 	 * of the custom number. (e.g. 4 digits in base 10 has a limit of 10000.)
 	 */
-	protected $_rangeNeededForDigits;
+	protected $_rangeNeededForDigits ;
 
 	/**
 	 * Array of number of bits by range of numbers.
@@ -647,7 +647,7 @@ abstract class WeirdoCustomDigits {
 	 * represent any number in that range. (Actually stored is the limit of the range,
 	 * log2(n), which starts at zero and ends at one less than the limit.)
 	 */
-	protected $_bitsNeededForRange;
+	protected $_bitsNeededForRange ;
 
 	/**
 	 * The maximum number of hexadecimal digits that both decbin(hexdec($hex)) and
@@ -675,16 +675,16 @@ abstract class WeirdoCustomDigits {
 	/**
 	 * Function vector for mapable class functions
 	 */
-	private $_fn;
+	private $_fn ;
 
 	/**
 	 * Boolean indicator if Unicode is supported by this instance (See initialization
 	 * parameter $use_uc.)
 	 */
-	private $_is_using_uc;
+	private $_is_using_uc ;
 
 }
 // Once-only invocation to initialize static properties
-WeirdoCustomDigits::_initStatic();
+WeirdoCustomDigits::_initStatic() ;
 
 /** @}*/

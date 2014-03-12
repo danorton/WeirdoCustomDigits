@@ -18,7 +18,7 @@
  *
  */
 
-require_once( 'WeirdoCustomDigits.php' );
+require_once( 'WeirdoCustomDigits.php' ) ;
 
 /**
  * Implementation of WeirdoCustomDigits using the bc extension for arithmetic
@@ -38,7 +38,7 @@ class WeirdoCustomDigitsBc extends WeirdoCustomDigits {
 	 *
 	 * For this class, the value is null, indicating that there is no limit.
 	 */
-	public static $maximumValue = null;
+	public static $maximumValue = null ;
 
 	/**
 	 * For parameters and semantics, see WeirdoCustomDigits::__construct().
@@ -50,79 +50,84 @@ class WeirdoCustomDigitsBc extends WeirdoCustomDigits {
 		if ( !function_exists( 'bcdiv' ) ) {
 			throw new ErrorException(
 				sprintf( 'Error detected by %s(): Required extension missing: bc.', __METHOD__ )
-			);
+			) ;
 		}
-		parent::__construct( $digits, $radix, $use_uc );
+		parent::__construct( $digits, $radix, $use_uc ) ;
 	}
 
 	/** For parameters and semantics, see WeirdoCustomDigits::binFromDecimal(). */
 	public static function binFromDecimal( $decimalNumber ) {
 
-		$binChunks = array();
+		$binChunks = array() ;
 		do {
 			$chunk = decbin( bcmod( $decimalNumber, self::$_dechexDivisor ) ) ;
-			$decimalNumber = bcdiv( $decimalNumber, self::$_dechexDivisor, 0 );
+			$decimalNumber = bcdiv( $decimalNumber, self::$_dechexDivisor, 0 ) ;
 			if ( $decimalNumber !== '0' ) {
 				$chunk = sprintf( self::$_binChunkPaddingFormat, $chunk ) ;
 			}
-			$binChunks[] = $chunk;
+			$binChunks[] = $chunk ;
 		} while ( $decimalNumber !== '0' ) ;
 
-		return implode( '', array_reverse( $binChunks ) );
+		return implode( '', array_reverse( $binChunks ) ) ;
 	}
 
 	/** For parameters and semantics, see WeirdoCustomDigits::customFromDecimal(). */
 	public function customFromDecimal( $decimalNumber, $minCustomDigits=1 ) {
 		// the internal format for bc accepts decimal strings directly
-		return $this->customFromInternal( $decimalNumber, $minCustomDigits );
+		return $this->customFromInternal( $decimalNumber, $minCustomDigits ) ;
 	}
 
 	/** For parameters and semantics, see WeirdoCustomDigits::customFromHex(). */
 	public function customFromHex( $hexNumber, $minCustomDigits=1 ) {
 		// convert hex numbers to decimal for bc
-		return $this->customFromInternal( hexdec( $hexNumber ), $minCustomDigits );
+		return $this->customFromInternal( hexdec( $hexNumber ), $minCustomDigits ) ;
 	}
 
 	/** For parameters and semantics, see WeirdoCustomDigits::customFromInternal(). */
 	public function customFromInternal( $internal, $minCustomDigits=1 ) {
-		$digits = array();
+		$digits = array() ;
 		while ( $internal ) {
-			$digits[] = $this->_digitsArray[intval( bcmod( $internal, $this->_radix ) )];
+			$digits[] = $this->_digitsArray[intval( bcmod( $internal, $this->_radix ) )] ;
 			$internal = bcdiv( $internal, $this->_radix, 0 ) ;
 		}
-		$customNumber = implode( array_reverse( $digits ) );
+		$customNumber = implode( array_reverse( $digits ) ) ;
 		if ( count( $digits ) < $minCustomDigits ) {
-			$customNumber = str_repeat( $this->_digitsArray[0], $minCustomDigits - count( $digits ) ) . $customNumber;
+			$customNumber = str_repeat( $this->_digitsArray[0], $minCustomDigits - count( $digits ) ) . $customNumber ;
 		}
-		return $customNumber;
+		return $customNumber ;
 	}
 
 	/** For parameters and semantics, see WeirdoCustomDigits::customRandomDigits(). */
 	public function customRandomDigits( $nDigits ) {
-		$range = $this->_getRangeNeededForCustomDigits( (int)$nDigits );
+		$range = $this->_getRangeNeededForCustomDigits( (int)$nDigits ) ;
 		if ( $range ) {
-			return $this->customRandomFromInternalRange( $range );
+			$result = $this->customRandomFromInternalRange( $range ) ;
+      $needDigits = $nDigits - strlen( $result ) ;
+      if ( $needDigits > 0 ) {
+        $result = str_repeat( $this->_digitsArray[0], $needDigits ) . $result ;
+      }
+      return $result ;
 		}
 	}
 
 	/** For parameters and semantics, see WeirdoCustomDigits::customRandomFromInternalRange(). */
 	public function customRandomFromInternalRange( $rangeInternal ) {
-		$numBits = $this->_getBitsNeededForRangeInternal( $rangeInternal );
+		$numBits = $this->_getBitsNeededForRangeInternal( $rangeInternal ) ;
 		if ( $numBits ) {
-			$limit = 100;
+			$limit = 100 ;
 			do {
 				if ( $limit-- < 0 ) {
 					throw new ErrorException(
 						sprintf( 'Error detected by %s(): randomization failure', __METHOD__ )
-					);
+					) ;
 				}
-				$random = self::decimalFromHex( $this->hexFromRandomBits( $numBits ) );
+				$random = self::decimalFromHex( $this->hexFromRandomBits( $numBits ) ) ;
 			} while ( bccomp( $random, $rangeInternal ) >= 0 ) ;
-			$random = $this->customFromInternal( $random );
+			$random = $this->customFromInternal( $random ) ;
 		} else {
-			$random = null;
+			$random = null ;
 		}
-		return $random;
+		return $random ;
 	}
 
 	/** For parameters and semantics, see WeirdoCustomDigits::decimalFromBin(). */
@@ -130,28 +135,28 @@ class WeirdoCustomDigitsBc extends WeirdoCustomDigits {
 
 		// trim leading zeros
 		if ( $binNumber[0] === '0' ) {
-			$binNumber = ltrim( $binNumber, '0' );
+			$binNumber = ltrim( $binNumber, '0' ) ;
 			if ( $binNumber === '' ) {
 				return '0'; // quick exit for the degenerate case
 			}
 		}
 
 		// split the number into chunks that we can pass to bindec()
-		$binChunks = array_reverse ( str_split( $binNumber, self::$_bindecChunkSize ) );
+		$binChunks = array_reverse ( str_split( $binNumber, self::$_bindecChunkSize ) ) ;
 
 		// convert one chunk at a time
-		$sum = 0;
+		$sum = 0 ;
 		do {
-			$chunk = array_pop( $binChunks );
-			$decimalChunk = bindec( $chunk );
+			$chunk = array_pop( $binChunks ) ;
+			$decimalChunk = bindec( $chunk ) ;
 			// if the result is a floating point number, we use sprintf to extract the integer significand as a string
 			if (is_float( $decimalChunk ) ) {
-				$decimalChunk = sprintf('%.0f', $decimalChunk);
+				$decimalChunk = sprintf('%.0f', $decimalChunk) ;
 			}
-			$sum = bcadd( bcmul( $sum, 1 << strlen( $chunk ), 0 ), $decimalChunk, 0 );
+			$sum = bcadd( bcmul( $sum, 1 << strlen( $chunk ), 0 ), $decimalChunk, 0 ) ;
 		} while ( count( $binChunks ) ) ;
 
-		return $sum;
+		return $sum ;
 	}
 
 	/** For parameters and semantics, see WeirdoCustomDigits::decimalFromHex(). */
@@ -159,96 +164,96 @@ class WeirdoCustomDigitsBc extends WeirdoCustomDigits {
 
 		// trim leading zeros
 		if ( $hexNumber[0] === '0' ) {
-			$hexNumber = ltrim( $hexNumber, '0' );
+			$hexNumber = ltrim( $hexNumber, '0' ) ;
 			if ( $hexNumber === '' ) {
 				return '0'; // quick exit for the degenerate case
 			}
 		}
 
 		// split the number into chunks that we can pass to hexdec()
-		$hexChunks = array_reverse ( str_split( $hexNumber, self::$_hexdecChunkSize ) );
+		$hexChunks = array_reverse ( str_split( $hexNumber, self::$_hexdecChunkSize ) ) ;
 
 		// convert one chunk at a time
-		$sum = 0;
+		$sum = 0 ;
 		do {
-			$chunk = array_pop( $hexChunks );
-			$decimalChunk = hexdec( $chunk );
+			$chunk = array_pop( $hexChunks ) ;
+			$decimalChunk = hexdec( $chunk ) ;
 			// if the result is a floating point number, we use sprintf to extract the integer significand as a string
 			if (is_float( $decimalChunk ) ) {
-				$decimalChunk = sprintf('%.0f', $decimalChunk);
+				$decimalChunk = sprintf('%.0f', $decimalChunk) ;
 			}
-			$sum = bcadd( bcmul( $sum, 1 << ( strlen( $chunk ) << 2 ), 0 ), $decimalChunk, 0 );
+			$sum = bcadd( bcmul( $sum, 1 << ( strlen( $chunk ) << 2 ), 0 ), $decimalChunk, 0 ) ;
 		} while ( count( $hexChunks ) ) ;
 
-		return $sum;
+		return $sum ;
 	}
 
 	/** For parameters and semantics, see WeirdoCustomDigits::decimalFromCustom(). */
 	public function decimalFromCustom( $customNumber ) {
 		// our internal format is decimal
-		return $this->internalFromCustom( $customNumber );
+		return $this->internalFromCustom( $customNumber ) ;
 	}
 
 	/** For parameters and semantics, see WeirdoCustomDigits::decimalFromInternal(). */
 	public function decimalFromInternal( $internal ) {
 		// our internal format is decimal
-		return $internal;
+		return $internal ;
 	}
 
 	/** For parameters and semantics, see WeirdoCustomDigits::hexFromDecimal(). */
 	public static function hexFromDecimal( $decimalNumber ) {
 
-		$hexChunks = array();
+		$hexChunks = array() ;
 		do {
 			$chunk = dechex( bcmod( $decimalNumber, self::$_dechexDivisor ) ) ;
-			$decimalNumber = bcdiv( $decimalNumber, self::$_dechexDivisor, 0 );
+			$decimalNumber = bcdiv( $decimalNumber, self::$_dechexDivisor, 0 ) ;
 			if ( $decimalNumber !== '0' ) {
 				$chunk = sprintf( self::$_hexChunkPaddingFormat, $chunk ) ;
 			}
-			$hexChunks[] = $chunk;
-		} while ( $decimalNumber !== '0' );
+			$hexChunks[] = $chunk ;
+		} while ( $decimalNumber !== '0' ) ;
 
-		return implode( '', array_reverse( $hexChunks ) );
+		return implode( '', array_reverse( $hexChunks ) ) ;
 	}
 
 	/** For parameters and semantics, see WeirdoCustomDigits::hexFromCustom(). */
 	public function hexFromCustom( $customNumber ) {
-		return self::hexFromDecimal( $this->internalFromCustom( $customNumber ) );
+		return self::hexFromDecimal( $this->internalFromCustom( $customNumber ) ) ;
 	}
 
 	/** For parameters and semantics, see WeirdoCustomDigits::hexFromInternal(). */
 	public function hexFromInternal( $internal ) {
-		return self::hexFromDecimal( $internal );
+		return self::hexFromDecimal( $internal ) ;
 	}
 
 	/** For parameters and semantics, see WeirdoCustomDigits::internalFromCustom(). */
 	public function internalFromCustom( $customNumber ) {
-		$sum = 0;
-		$digits = array_reverse( $this->str_split( $customNumber ) );
+		$sum = 0 ;
+		$digits = array_reverse( $this->str_split( $customNumber ) ) ;
 		while ( count( $digits ) ) {
-			$key = "#" . array_pop( $digits );
+			$key = "#" . array_pop( $digits ) ;
 			if ( !isset( $this->_digitValues[$key] ) ) {
 				throw new ErrorException(
 					sprintf('Error detected by %s(): unrecognized digit ( %s ).',
 						__METHOD__,
 						substr( $key, 1 )
 					)
-				);
+				) ;
 			}
-			$sum = bcadd( bcmul( $sum, $this->_radix, 0 ), $this->_digitValues[$key], 0 );
+			$sum = bcadd( bcmul( $sum, $this->_radix, 0 ), $this->_digitValues[$key], 0 ) ;
 		}
-		return $sum;
+		return $sum ;
 	}
 
 	/** For parameters and semantics, see WeirdoCustomDigits::internalFromDecimal(). */
 	public function internalFromDecimal( $decimalNumber ) {
 		// our internal format is a decimal string
-		return "$decimalNumber";
+		return "$decimalNumber" ;
 	}
 
 	/** For parameters and semantics, see WeirdoCustomDigits::internalFromHex(). */
 	public function internalFromHex( $hexNumber ) {
-		return self::decimalFromHex( $hexNumber );
+		return self::decimalFromHex( $hexNumber ) ;
 	}
 
 	/** For parameters and semantics, see WeirdoCustomDigits::_getBitsNeededForRangeInternal().
@@ -256,10 +261,10 @@ class WeirdoCustomDigitsBc extends WeirdoCustomDigits {
 	 */
 	protected function _getBitsNeededForRangeInternal( $rangeInternal ) {
 		if ( !array_key_exists( $rangeInternal, $this->_bitsNeededForRange ) ) {
-			$this->_bitsNeededForRange[$rangeInternal] = strlen( self::binFromDecimal( bcsub( $rangeInternal, 1, 0 ) ) );
-			self::_trim_array_lru( $this->_bitsNeededForRange, 100, 10 );
+			$this->_bitsNeededForRange[$rangeInternal] = strlen( self::binFromDecimal( bcsub( $rangeInternal, 1, 0 ) ) ) ;
+			self::_trim_array_lru( $this->_bitsNeededForRange, 100, 10 ) ;
 		}
-		return $this->_bitsNeededForRange[$rangeInternal];
+		return $this->_bitsNeededForRange[$rangeInternal] ;
 	}
 
 	/** For parameters and semantics, see WeirdoCustomDigits::_getRangeNeededForCustomDigits().
@@ -268,9 +273,9 @@ class WeirdoCustomDigitsBc extends WeirdoCustomDigits {
 	protected function _getRangeNeededForCustomDigits( $nDigits ) {
 		if ( !array_key_exists( $nDigits, $this->_rangeNeededForDigits ) ) {
 			$this->_rangeNeededForDigits[$nDigits] = bcpow( $this->_radix, $nDigits ) ;
-			self::_trim_array_lru( $this->_rangeNeededForDigits, 100, 10 );
+			self::_trim_array_lru( $this->_rangeNeededForDigits, 100, 10 ) ;
 		}
-		return $this->_rangeNeededForDigits[$nDigits];
+		return $this->_rangeNeededForDigits[$nDigits] ;
 	}
 
 	/** For semantics, see WeirdoCustomDigits::_initStatic().
@@ -278,13 +283,13 @@ class WeirdoCustomDigitsBc extends WeirdoCustomDigits {
 	 */
 	public static function _initStatic() {
 		if ( !self::$_hexdecChunkSize) {
-			self::$_hexdecChunkSize = min( ( PHP_INT_SIZE << 3 ) - 1, self::$phpIntegerMaxBits ) >> 2;
-			self::$_dechexDivisor = sprintf( '%.0f', hexdec( '1' . str_repeat( '0', self::$_hexdecChunkSize ) ) );
-			self::$_hexChunkPaddingFormat = '%0' . self::$_hexdecChunkSize . 's';
-			self::$_bindecChunkSize = self::$_hexdecChunkSize << 2;
-			self::$_binChunkPaddingFormat = '%0' . self::$_bindecChunkSize . 's';
+			self::$_hexdecChunkSize = min( ( PHP_INT_SIZE << 3 ) - 1, self::$phpIntegerMaxBits ) >> 2 ;
+			self::$_dechexDivisor = sprintf( '%.0f', hexdec( '1' . str_repeat( '0', self::$_hexdecChunkSize ) ) ) ;
+			self::$_hexChunkPaddingFormat = '%0' . self::$_hexdecChunkSize . 's' ;
+			self::$_bindecChunkSize = self::$_hexdecChunkSize << 2 ;
+			self::$_binChunkPaddingFormat = '%0' . self::$_bindecChunkSize . 's' ;
 		} else {
-			throw new ErrorException( sprintf( 'Invalid invocation of %s().', __METHOD__ ) );
+			throw new ErrorException( sprintf( 'Invalid invocation of %s().', __METHOD__ ) ) ;
 		}
 	}
 
@@ -295,7 +300,7 @@ class WeirdoCustomDigitsBc extends WeirdoCustomDigits {
 	private static $_hexdecChunkSize ;
 
 	/** This int represents the number of bits that corresponds to _hexdecChunkSize. */
-	private static $_bindecChunkSize;
+	private static $_bindecChunkSize ;
 
 	/**
 	 * printf format to left-zero-fill a hex string to the number of hex digits we extract
@@ -305,6 +310,6 @@ class WeirdoCustomDigitsBc extends WeirdoCustomDigits {
 
 }
 // Once-only invocation to initialize static properties
-WeirdoCustomDigitsBc::_initStatic();
+WeirdoCustomDigitsBc::_initStatic() ;
 
 /** @}*/

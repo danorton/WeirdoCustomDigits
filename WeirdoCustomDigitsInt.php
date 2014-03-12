@@ -18,7 +18,7 @@
  *
  */
 
-require_once( __DIR__ . '/WeirdoCustomDigits.php' );
+require_once( __DIR__ . '/WeirdoCustomDigits.php' ) ;
 
 /**
  * Implementation of WeirdoCustomDigits using built-in integer arithmetic
@@ -43,113 +43,118 @@ class WeirdoCustomDigitsInt extends WeirdoCustomDigits {
 
 	/** For parameters and semantics, see WeirdoCustomDigits::binFromDecimal(). */
 	public static function binFromDecimal( $decimalNumber ) {
-		return decbin( $decimalNumber );
+		return decbin( $decimalNumber ) ;
 	}
 
 	/** For parameters and semantics, see WeirdoCustomDigits::customFromDecimal(). */
 	public function customFromDecimal( $decimalNumber, $minCustomDigits=1 ) {
-		return $this->customFromInternal( $decimalNumber, $minCustomDigits );
+		return $this->customFromInternal( $decimalNumber, $minCustomDigits ) ;
 	}
 
 	/** For parameters and semantics, see WeirdoCustomDigits::customFromHex(). */
 	public function customFromHex( $hexNumber, $minCustomDigits=1 ) {
-		return $this->customFromInternal( hexdec( $hexNumber ), $minCustomDigits );
+		return $this->customFromInternal( hexdec( $hexNumber ), $minCustomDigits ) ;
 	}
 
 	/** For parameters and semantics, see WeirdoCustomDigits::customFromInternal(). */
 	public function customFromInternal( $internal, $minCustomDigits=1 ) {
-		$digits = array();
+		$digits = array() ;
 		while ( $internal ) {
-			$digits[] = $this->_digitsArray[$internal % $this->_radix];
+			$digits[] = $this->_digitsArray[$internal % $this->_radix] ;
 			$internal = intval( $internal / $this->_radix ) ;
 		}
-		$customNumber = implode( array_reverse( $digits ) );
+		$customNumber = implode( array_reverse( $digits ) ) ;
 		if ( count( $digits ) < $minCustomDigits ) {
-			$customNumber = str_repeat( $this->_digitsArray[0], $minCustomDigits - count( $digits ) ) . $customNumber;
+			$customNumber = str_repeat( $this->_digitsArray[0], $minCustomDigits - count( $digits ) ) . $customNumber ;
 		}
-		return $customNumber;
+		return $customNumber ;
 	}
 
 	/** For parameters and semantics, see WeirdoCustomDigits::decimalFromHex(). */
 	public static function decimalFromHex( $hexNumber ) {
-		return hexdec( $hexNumber );
+		return hexdec( $hexNumber ) ;
 	}
 
 	/** For parameters and semantics, see WeirdoCustomDigits::decimalFromBin(). */
 	public static function decimalFromBin( $binNumber ) {
-		return bindec( $binNumber );
+		return bindec( $binNumber ) ;
 	}
 
 	/** For parameters and semantics, see WeirdoCustomDigits::decimalFromCustom(). */
 	public function decimalFromCustom( $customNumber ) {
-		return $this->internalFromCustom( $customNumber );
+		return $this->internalFromCustom( $customNumber ) ;
 	}
 
 	/** For parameters and semantics, see WeirdoCustomDigits::decimalFromInternal(). */
 	public function decimalFromInternal( $internal ) {
-		return $internal;
+		return $internal ;
 	}
 
 	/** For parameters and semantics, see WeirdoCustomDigits::hexFromDecimal(). */
 	public static function hexFromDecimal( $decimalNumber ) {
-		return dechex( $decimalNumber );
+		return dechex( $decimalNumber ) ;
 	}
 
 	/** For parameters and semantics, see WeirdoCustomDigits::hexFromCustom(). */
 	public function hexFromCustom( $customNumber ) {
-		return dechex( $this->internalFromCustom( $customNumber ) );
+		return dechex( $this->internalFromCustom( $customNumber ) ) ;
 	}
 
 	/** For parameters and semantics, see WeirdoCustomDigits::hexFromInternal(). */
 	public function hexFromInternal( $internal ) {
-		return dechex( $internal );
+		return dechex( $internal ) ;
 	}
 
 	/** For parameters and semantics, see WeirdoCustomDigits::internalFromCustom(). */
 	public function internalFromCustom( $customNumber ) {
-		$sum = 0;
-		$digits = array_reverse( $this->str_split( $customNumber ) );
+		$sum = 0 ;
+		$digits = array_reverse( $this->str_split( $customNumber ) ) ;
 		while ( count( $digits ) ) {
-			$key = "#" . array_pop( $digits );
+			$key = "#" . array_pop( $digits ) ;
 			if ( !isset( $this->_digitValues[$key] ) ) {
-				throw new ErrorException( 'Error detected by ' . __METHOD__ . '(): unrecognized digit ( ' . substr( $key, 1 ) . ' ).' );
+				throw new ErrorException( 'Error detected by ' . __METHOD__ . '(): unrecognized digit ( ' . substr( $key, 1 ) . ' ).' ) ;
 			}
-			$sum = intval( intval( $sum * $this->_radix ) + $this->_digitValues[$key] );
+			$sum = intval( intval( $sum * $this->_radix ) + $this->_digitValues[$key] ) ;
 		}
-		return $sum;
+		return $sum ;
 	}
 
 	/** For parameters and semantics, see WeirdoCustomDigits::internalFromDecimal(). */
 	public function internalFromDecimal( $decimalNumber ) {
-		return intval( $decimalNumber );
+		return intval( $decimalNumber ) ;
 	}
 
 	/** For parameters and semantics, see WeirdoCustomDigits::internalFromHex(). */
 	public function internalFromHex( $hexNumber ) {
-		return hexdec( $hexNumber );
+		return hexdec( $hexNumber ) ;
 	}
 
 	/** For parameters and semantics, see WeirdoCustomDigits::customRandomDigits(). */
 	public function customRandomDigits( $nDigits ) {
-		$range = $this->_getRangeNeededForCustomDigits( (int)$nDigits );
+		$range = $this->_getRangeNeededForCustomDigits( (int)$nDigits ) ;
 		if ( $range ) {
-			return $this->customRandomFromInternalRange( $range );
+      $result = $this->customRandomFromInternalRange( $range ) ;
+      $needDigits = $nDigits - strlen( $result ) ;
+      if ( $needDigits > 0 ) {
+        $result = str_repeat( $this->_digitsArray[0], $needDigits ) . $result ;
+      }
+      return $result ;
 		}
 	}
 
 	/** For parameters and semantics, see WeirdoCustomDigits::customRandomFromInternalRange(). */
 	public function customRandomFromInternalRange( $rangeInternal ) {
-		$rangeInternal = (int)$rangeInternal;
-		$numBits = $this->_getBitsNeededForRangeInternal( $rangeInternal );
+		$rangeInternal = (int)$rangeInternal ;
+		$numBits = $this->_getBitsNeededForRangeInternal( $rangeInternal ) ;
 		if ( $numBits ) {
 			do {
-				$random = $this->hexFromRandomBits( $numBits );
+				$random = $this->hexFromRandomBits( $numBits ) ;
 			} while ( hexdec( $random ) >= $rangeInternal ) ;
-			$random = $this->customFromHex( $random );
+			$random = $this->customFromHex( $random ) ;
 		} else {
-			$random = null;
+			$random = null ;
 		}
-		return $random;
+		return $random ;
 	}
 
 	/** For parameters and semantics, see WeirdoCustomDigits::_getBitsNeededForRangeInternal().
@@ -160,10 +165,10 @@ class WeirdoCustomDigitsInt extends WeirdoCustomDigits {
 			$this->_bitsNeededForRange[$rangeInternal] =
 				( ( $rangeInternal > 0 ) && ( $rangeInternal <= static::$maximumValue ) )
 					? strlen( decbin( $rangeInternal - 1 ) )
-					: null;
-			self::_trim_array_lru( $this->_bitsNeededForRange, 100, 10 );
+					: null ;
+			self::_trim_array_lru( $this->_bitsNeededForRange, 100, 10 ) ;
 		}
-		return $this->_bitsNeededForRange[$rangeInternal];
+		return $this->_bitsNeededForRange[$rangeInternal] ;
 	}
 
 	/** For parameters and semantics, see WeirdoCustomDigits::_getRangeNeededForCustomDigits().
@@ -171,14 +176,14 @@ class WeirdoCustomDigitsInt extends WeirdoCustomDigits {
 	 */
 	protected function _getRangeNeededForCustomDigits( $nDigitsDecimal ) {
 		if ( !array_key_exists( $nDigitsDecimal, $this->_rangeNeededForDigits ) ) {
-			$range = pow( $this->_radix, $nDigitsDecimal );
+			$range = pow( $this->_radix, $nDigitsDecimal ) ;
 			if ( $range > static::$maximumValue ) {
-				$range = null;
+				$range = null ;
 			}
-			$this->_rangeNeededForDigits[$nDigitsDecimal] = $range;
-			self::_trim_array_lru( $this->_rangeNeededForDigits, 100, 10 );
+			$this->_rangeNeededForDigits[$nDigitsDecimal] = $range ;
+			self::_trim_array_lru( $this->_rangeNeededForDigits, 100, 10 ) ;
 		}
-		return $this->_rangeNeededForDigits[$nDigitsDecimal];
+		return $this->_rangeNeededForDigits[$nDigitsDecimal] ;
 	}
 
 	/** For semantics, see WeirdoCustomDigits::_initStatic().
@@ -188,12 +193,12 @@ class WeirdoCustomDigitsInt extends WeirdoCustomDigits {
 		if ( !self::$maximumValue ) {
 			self::$maximumValue = (int) min ( PHP_INT_MAX, pow( 2, self::$phpIntegerMaxBits ) - 1 ) ;
 		} else {
-			throw new ErrorException( sprintf( 'Invalid invocation of %s().', __METHOD__ ) );
+			throw new ErrorException( sprintf( 'Invalid invocation of %s().', __METHOD__ ) ) ;
 		}
 	}
 
 }
 // Once-only invocation to initialize static properties
-WeirdoCustomDigitsInt::_initStatic();
+WeirdoCustomDigitsInt::_initStatic() ;
 
 /** @}*/
