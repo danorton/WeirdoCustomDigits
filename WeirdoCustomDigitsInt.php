@@ -133,12 +133,17 @@ class WeirdoCustomDigitsInt extends WeirdoCustomDigits {
 	public function customRandomDigits( $nDigits ) {
 		$range = $this->_getRangeNeededForCustomDigits( (int)$nDigits ) ;
 		if ( $range ) {
-      $result = $this->customRandomFromInternalRange( $range ) ;
-      $needDigits = $nDigits - strlen( $result ) ;
-      if ( $needDigits > 0 ) {
-        $result = str_repeat( $this->_digitsArray[0], $needDigits ) . $result ;
-      }
-      return $result ;
+			$result = $this->customRandomFromInternalRange( $range ) ;
+			$needDigits = $nDigits - strlen( $result ) ;
+			if ( $needDigits > 0 ) {
+				$result = str_repeat( $this->_digitsArray[0], $needDigits ) . $result ;
+			}
+			return $result ;
+		}
+		else {
+			throw new ErrorException(
+				sprintf( 'Error detected by %s(): $nDigits exceeds numerical range', __METHOD__ )
+			) ;
 		}
 	}
 

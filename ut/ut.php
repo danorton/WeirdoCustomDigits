@@ -24,18 +24,17 @@ function getException( $context, $fn ) {
 	$exception = false ;
 	try {
 		$fn( $context ) ;
-	}
-	catch ( Exception $e ) {
+	} catch ( Exception $e ) {
 		$exception = $e ;
 	}
 	return $exception ;
 }
 
-function get_rand() {
-  if ( PHP_INT_MAX > mt_getrandmax() ) {
-    return ( mt_rand() << 31 | mt_rand() ) ;
-  }
-	return mt_rand() ;
+function get_rand($mask) {
+	if ( PHP_INT_MAX > mt_getrandmax() ) {
+		return ( mt_rand() << 31 | mt_rand() ) ;
+	}
+	return mt_rand() & $mask ;
 }
 
 function error_handler( $errno, $errstr, $errfile, $errline, $errcontext ) {
@@ -50,13 +49,19 @@ require_once( __DIR__ . '/../WeirdoCustomDigitsInt.php' ) ;
 printf( "WeirdoCustomDigitsInt::\$maximumValue=%s\n", WeirdoCustomDigitsInt::$maximumValue ) ;
 $randomInts = array( 0 ) ;
 for ( $i = 0 ; $i<10000 ; $i++ ) {
-	$randomInts[] = get_rand() & WeirdoCustomDigitsInt::$maximumValue ;
+	$randomInts[] = get_rand(WeirdoCustomDigitsInt::$maximumValue) & WeirdoCustomDigitsInt::$maximumValue ;
 }
 $randomInts[] = WeirdoCustomDigitsInt::$maximumValue ;
 
 $randomDecimalStrings = array( '0' ) ;
 for ( $i = 0 ; $i<10000 ; $i++ ) {
-	$randomDecimalStrings[] = get_rand() . get_rand() . get_rand() . get_rand() . get_rand() ;
+	$randomDecimalStrings[] =
+		get_rand(PHP_INT_MAX) .
+		get_rand(PHP_INT_MAX) .
+		get_rand(PHP_INT_MAX) .
+		get_rand(PHP_INT_MAX) .
+		get_rand(PHP_INT_MAX)
+		;
 }
 $randomDecimalStrings[] = PHP_INT_MAX . PHP_INT_MAX . PHP_INT_MAX ;
 //*///
@@ -192,8 +197,14 @@ foreach ( array( 'Bc', 'Int', 'Gmp' ) as $mathType ) {
 
 
 	for ( $i=0 ; $i<10 ; $i++ ) {
-		$random = $wrdx51->customRandomDigits( $i+1 ) ;
-		if ( $random === null ) break ;
+	  try {
+			$random = $wrdx51->customRandomDigits( $i+1 ) ;
+		} catch ( Exception $e ) {
+			printf( "\n*** Unable to invoke customRandomDigits() with \$nDigits=%u\n", $i + 1 );
+			printf( "%s\n", $e->getMessage() ) ;
+			// We don't increment $failures, as this is simply a limit of our testing
+			break;
+		}
 		printf( "%s:", $i+1 ) ;
 		printf( "%s ", $random ) ;
 		if ( $className::$maximumValue ) {
@@ -207,8 +218,8 @@ foreach ( array( 'Bc', 'Int', 'Gmp' ) as $mathType ) {
 
 }
 if ( count( $failures ) ) {
-  echo "===========\n" ;
+	echo "===========\n" ;
 	echo join( "\n", $failures ) . "\n" ;
-  printf( "FAIL\n" ) ;
+	printf( "FAIL\n" ) ;
 	exit( 1 ) ;
 }
