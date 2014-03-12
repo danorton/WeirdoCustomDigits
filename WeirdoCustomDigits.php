@@ -95,7 +95,7 @@
 abstract class WeirdoCustomDigits {
 
 	/** Class version */
-	const VERSION = '1.0.0' ;
+	const VERSION = '1.0.1' ;
 
 	/** Digits for radixes up to base 70 (compatible with base_convert and gmp up to base 36) */
 	const DIGITS_70 =     '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_.*~!()-' ;
