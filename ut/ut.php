@@ -37,6 +37,22 @@ function get_rand($mask) {
 	return mt_rand() & $mask ;
 }
 
+function testBase64($className) {
+	$w = new $className( WeirdoCustomDigits::DIGITS_BASE64 ) ;
+	if ( $className::$maximumValue === null ) {
+		$rawString = 'This is for weirdos!!' ;
+		$b64String = base64_encode( $rawString ) ;
+	} elseif ( $className::$maximumValue <= 0x7fffffff ) {
+		$rawString = 'Odd' ;
+		$b64String = base64_encode( $rawString ) ;
+	} else {
+		$b64String = 'T2RkaXR5' ;
+		$rawString = base64_decode ( $b64String ) ;
+	}
+	assert( $w->rawFromCustom( $b64String ) === $rawString ) ;
+	assert( $w->customFromRaw( $rawString ) === $b64String ) ;
+}
+
 function error_handler( $errno, $errstr, $errfile, $errline, $errcontext ) {
 	printf( "FAIL: ERROR %u at %s:%u: %s\n", $errno, $errfile, $errline, $errstr ) ;
 	exit( 1 ) ;
@@ -104,6 +120,8 @@ foreach ( array( 'Bc', 'Int', 'Gmp' ) as $mathType ) {
 		continue ;
 	}
 	
+	testBase64($className) ;
+
 	$wrdx10->init( '0123456789' ) ;
 	if ( !getException( $wrdx10, function ( $o ) { $o->validateCustomNumber( '0x99' ) ; } ) ) {
 		throw new ErrorException( 'Unit test: internalFromDecimal() accepted invalid digit' ) ;

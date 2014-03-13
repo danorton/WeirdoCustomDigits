@@ -100,6 +100,9 @@ abstract class WeirdoCustomDigits {
 	/** Digits for radixes up to base 70 (compatible with base_convert and gmp up to base 36) */
 	const DIGITS_70 =     '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_.*~!()-' ;
 
+	/** Digits compatible with base64 encoding */
+	const DIGITS_BASE64 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/' ;
+ 
 	/** Digits compatibile with gmp from base 37 to base 62 */
 	const DIGITS_62_GMP = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz' ;
 
@@ -283,6 +286,36 @@ abstract class WeirdoCustomDigits {
 	}
 
 	/**
+	 * Convert a custom-number string to a raw byte string
+	 *
+	 * @param[in] string  $customNumber custom-number string
+	 * @returns           raw byte string (*not* a text string).
+	 */
+	public function rawFromCustom( $customNumber ) {
+    return self::rawFromHex( $this->hexFromCustom( $customNumber ) ) ;
+  }
+
+	/**
+	 * Convert a hexadecimal string to a raw byte string
+	 *
+	 * This method imposes no limit on the number of digits in the given number or in the resulting
+	 * raw byte string.
+	 *
+	 * @note Leading zeros are not removed, but are transferred through.
+	 *
+	 * @param[in] string $hexNumber string of hexadecimal digits [0-9a-fA-F]. If the number of
+	 *                              digits is odd, the first digit is stored into a separate byte.
+	 * @returns          raw byte string (*not* a text string).
+	 */
+	public static function rawFromHex( $hexNumber ) {
+		// if an odd number of nybbles passed, make the first nybble zero
+		if ( strlen ( $hexNumber ) & 1 ) {
+			$hexNumber = "0$hexNumber";
+		}
+		return pack( 'H*', $hexNumber ) ;
+	}
+
+	/**
 	 * Convert a hexadecimal string to a binary-number string of zero (0) and one (1) characters.
 	 *
 	 * This method imposes no limit on the number of digits in the given number or in the resulting
@@ -318,7 +351,6 @@ abstract class WeirdoCustomDigits {
 		return join( '', $binaryChunks ) ;
 	}
 
-
 	/**
 	 * Convert a decimal number to a custom-number string.
 	 *
@@ -349,6 +381,18 @@ abstract class WeirdoCustomDigits {
 	 * @returns           custom-number string of custom digit characters
 	 */
 	abstract public function customFromInternal( $internal, $minCustomDigits=1 ) ;
+
+	/**
+	 * Convert an internally represented number to a raw byte string
+	 *
+	 * @param[in] string  $rawString string of raw bytes (*not* a text string).
+	 * @param[in] int     $minCustomDigits zero-fill the result to this many digits
+	 *                    (Note that a zero isn't necessarily the ASCII character '0'!)
+	 * @returns           custom-number string of custom digit characters
+	 */
+	public function customFromRaw( $rawString, $minCustomDigits=1 ) {
+    return $this->customFromHex( self::hexFromRaw( $rawString ), $minCustomDigits ) ;
+  }
 
 	/**
 	 * Convert a binary-number string to a decimal-number string
@@ -483,7 +527,7 @@ abstract class WeirdoCustomDigits {
 	 * <a href="http://php.net/openssl_random_pseudo_bytes">openssl_random_pseudo_bytes()</a>.
 	 *
 	 * @param[in] int     $nBits the number of random bits to obtain
-	 * @returns           hexadecimal digits.
+	 * @returns           hexadecimal digits
 	 */
 	public function hexFromRandomBits( $nBits ) {
 		// fetch random bytes
@@ -503,6 +547,21 @@ abstract class WeirdoCustomDigits {
 
 		// return the hex result
 		return bin2hex( $bits ) ;
+	}
+
+	/**
+	 * Convert a raw byte string to a hexadecimal string.
+	 *
+	 * This method imposes no limit on the number of digits in the given number or in the resulting
+	 * hexadecimal string.
+	 *
+	 * @note Leading zeros are not removed, but are transferred through as hex digits.
+	 *
+	 * @param[in] string $rawString string of raw bytes (*not* a text string).
+	 * @returns          hexadecimal digits
+	 */
+	public static function hexFromRaw( $rawString ) {
+		return bin2hex( $rawString ) ;
 	}
 
 	/**

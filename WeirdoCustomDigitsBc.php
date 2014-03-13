@@ -80,7 +80,7 @@ class WeirdoCustomDigitsBc extends WeirdoCustomDigits {
 	/** For parameters and semantics, see WeirdoCustomDigits::customFromHex(). */
 	public function customFromHex( $hexNumber, $minCustomDigits=1 ) {
 		// convert hex numbers to decimal for bc
-		return $this->customFromInternal( hexdec( $hexNumber ), $minCustomDigits ) ;
+		return $this->customFromInternal( $this->decimalFromHex( $hexNumber ), $minCustomDigits ) ;
 	}
 
 	/** For parameters and semantics, see WeirdoCustomDigits::customFromInternal(). */
