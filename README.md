@@ -17,7 +17,7 @@ Mountain View, California, 94041, USA.
 
 # Releases
 
- - **PENDING** 1.0.1 - enhancements, bug fixes & miscellaneous maintenance
+ - 1.0.1 - enhancements, bug fixes & miscellaneous maintenance
    - Enhancements:
      - #7 - Remove limit of $nDigits in WeirdoCustomDigitsInt::customRandomDigits()
              - When the parameter $allowOverflow is true, this method will allow the
