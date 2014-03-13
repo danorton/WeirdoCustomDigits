@@ -26,8 +26,11 @@ Mountain View, California, 94041, USA.
                a value that was outside the supported numerical range. This is only relevant
                to the WeirdoCustomDigitsInt implementation subclass, as the other
                subclasses have no limit on the numerical range.
+     - #8, #9 - Add base64 compatibility and raw bytes
+          - These two enhancements together provide low-lever base64 encode and decode.
    - Bugs fixed:
      - #1 - customRandomDigits() method returns fewer than $nDigits characters
+     - #5 - customRandomDigits returns null when $nDigits is beyond range
 
  - 1.0.0 - initial release
    - Seems to work
