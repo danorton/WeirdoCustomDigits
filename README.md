@@ -25,8 +25,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ## Releases
 
- - 1.0.2 - License under GPL v3
- - 1.0.1 - enhancements, bug fixes & miscellaneous maintenance
+ - 1.0.2-alpha - License under GPL v3
+ - 1.0.1-alpha - enhancements, bug fixes & miscellaneous maintenance
    - Enhancements:
      - #7 - Remove limit of $nDigits in WeirdoCustomDigitsInt::customRandomDigits()
              - When the parameter $allowOverflow is true, this method will allow the
@@ -41,7 +41,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
      - #1 - customRandomDigits() method returns fewer than $nDigits characters
      - #5 - customRandomDigits returns null when $nDigits is beyond range
 
- - 1.0.0 - initial release
+ - 1.0.0-alpha - initial release
    - Seems to work
    - API documented in Doxygen
    - Presumes IEEE 754 floating point, but that's configurable
